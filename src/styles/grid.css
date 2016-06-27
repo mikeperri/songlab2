@@ -1,0 +1,25 @@
+.note-grid {
+    position: relative;
+}
+
+.note-grid .grid-item {
+    position: absolute;
+    height: 100%;
+    width: 1px;
+    border: 0;
+}
+
+.note-grid .grid-item.note {
+    height: 50%;
+    top: 25%;
+    background: rgb(255, 0, 255);
+    width: 11px;
+    margin-left: -5px;
+    border-radius: 2px;
+    animation: fade-in 200ms;
+}
+
+@keyframes fade-in {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+}

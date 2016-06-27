@@ -1,0 +1,37 @@
+{
+  "name": "react-examples",
+  "version": "1.0.0",
+  "description": "Minimal example project for React",
+  "repository": "https://github.com/mikeperri/react-examples.git",
+  "main": "index.js",
+  "scripts": {
+    "build": "$(npm bin)/webpack --display-error-details",
+    "start": "$(npm bin)/webpack-dev-server --content-base dist/",
+    "test": "$(npm bin)/mocha src/testSetup.js src/components/**/*.test.jsx --compilers js:babel-core/register"
+  },
+  "author": "Mike Perri",
+  "license": "ISC",
+  "dependencies": {
+    "babel-loader": "^6.1.0",
+    "babel-preset-es2015": "^6.1.18",
+    "babel-preset-react": "^6.1.18",
+    "babelify": "^7.2.0",
+    "css-loader": "^0.23.1",
+    "html-webpack-plugin": "^2.19.0",
+    "lodash": "^4.13.1",
+    "react": "^15.1.0",
+    "react-dom": "^15.1.0",
+    "react-hot-loader": "^1.3.0",
+    "style-loader": "^0.13.1",
+    "webpack": "^1.13.1"
+  },
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "chai-enzyme": "^0.4.2",
+    "enzyme": "^2.3.0",
+    "mocha": "^2.5.3",
+    "react-addons-test-utils": "^15.1.0",
+    "sinon": "^1.17.4",
+    "webpack-dev-server": "^1.14.1"
+  }
+}

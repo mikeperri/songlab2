@@ -1,0 +1,4 @@
+If the individual components import their own styles, we have to run webpack every time we run the tests.
+So the files are just all getting imported into the main bundle now.
+
+Setup webpack to run mocha when bundle is ready
