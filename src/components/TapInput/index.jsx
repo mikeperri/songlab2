@@ -2,6 +2,7 @@ import React from 'react';
 import _ from 'lodash';
 
 import NoteGrid from '../NoteGrid';
+import Beat from './Beat';
 
 export default React.createClass({
     getInitialState: function () {
@@ -21,7 +22,6 @@ export default React.createClass({
             beats: [],
             tuplets: {
                 1: true,
-                1.5: true,
                 3: true,
                 5: false
             }
@@ -32,6 +32,7 @@ export default React.createClass({
         this.taps = [];
         this.earlyNoteTimes = [];
         this.pendingNoteTimes = [];
+        this.nextBeatNotes = [];
     },
     handleKeyDown: function (e) {
         if (!this.state.recording) {
@@ -65,10 +66,8 @@ export default React.createClass({
         this.taps.push(tap);
 
         if (this.taps.length === 1) {
-            if (this.earlyNoteTimes.length > 0) {
-                this.flushEarlyNotes();
-            }
-        } else if (this.pendingNoteTimes.length > 0) {
+            this.flushEarlyNotes();
+        } else {
             let beat = this.quantizeBeat(
                 this.state.beatDivisions,
                 this.state.tuplets,
@@ -76,6 +75,9 @@ export default React.createClass({
                 prevTap,
                 tap
             );
+
+            beat.notes = beat.notes.concat(this.nextBeatNotes);
+            this.nextBeatNotes = beat.nextBeatNotes;
 
             this.setState({
                 beats: this.state.beats.concat(beat)
@@ -104,8 +106,8 @@ export default React.createClass({
         let divisionPeriod = period / divisionCount;
 
         let rawDivision = msIntoBeat / divisionPeriod;
-        let division = Math.round(rawDivision);
-        let error = division - rawDivision;
+        let division = Math.abs(Math.round(rawDivision));
+        let error = (division - rawDivision) * divisionPeriod;
         let nextBeat = division == divisionCount;
 
         if (nextBeat) {
@@ -126,10 +128,20 @@ export default React.createClass({
         // totally arbitrary.
         return Math.abs(avg) + Math.pow(avgDeviation, 2);
     },
+    chooseBestTuplet: function (tupletToError) {
+        let bestTupletStr = _.minBy(_.keys(tupletToError), (tupletStr) => {
+            let weight = tupletStr === '1' ? 0.8 : 1;
+
+            return tupletToError[tupletStr] * weight;
+        });
+
+        return Number(bestTupletStr);
+    },
     quantizeBeat: function (beatDivisions, tuplets, noteTimes, tap1, tap2) {
-        console.log('note times', noteTimes);
-        console.log('tap1 time', tap1.time);
-        console.log('tap2 time', tap2.time);
+        if (noteTimes.length === 0) {
+            return new Beat([], [], 1);
+        }
+
         let period = this.getPeriod([tap1.time, tap2.time]);
         let activeTuplets = _(tuplets)
            .pickBy((t) => t === true)
@@ -150,36 +162,13 @@ export default React.createClass({
             tupletToError[tupletStr] = this.calculateNormalizedError(notes);
         });
 
-        let bestTupletStr = _.minBy(_.keys(tupletToError), (tupletStr) => {
-            return tupletToError[tupletStr];
-        });
-        let bestTuplet = Number(bestTupletStr);
+        let bestTuplet = this.chooseBestTuplet(tupletToError);
 
-        console.log('tte', tupletToError);
-        console.log('ttn', tupletToNotes);
+        let notes = tupletToNotes[bestTuplet];
+        let nextBeatNotes = _.filter(notes, { 'nextBeat': true });
+        notes.splice(notes.length - nextBeatNotes.length);
 
-        let notes = tupletToNotes[bestTupletStr];
-        _.forEach(notes, (note) => {
-            if (note.nextBeat) {
-                note.beatIndex = tap2.index;
-                note.division = 0;
-            } else {
-                note.beatIndex = tap1.index;
-            }
-
-            delete note.nextBeat;
-        });
-
-        if (notes.length === 1 && notes[0].division === 0) {
-            bestTuplet = 1;
-        }
-
-        console.log('notes', notes);
-
-        return {
-            notes,
-            tuplet: bestTuplet
-        };
+        return new Beat(notes, nextBeatNotes, bestTuplet);
     },
     getPeriod: function (taps) {
         let sum = 0;

@@ -32,5 +32,6 @@ module.exports = {
         new HtmlWebpackPlugin({
             title: 'SongLab'
         })
-    ]
+    ],
+    devtool: 'sourcemap'
 }

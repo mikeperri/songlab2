@@ -1,7 +1,7 @@
 import React from 'react';
 import _ from 'lodash';
 
-const MAX_ERROR = .15;
+const MAX_ERROR = 100;
 
 export default React.createClass({
     propTypes: {
@@ -33,9 +33,9 @@ export default React.createClass({
     },
     buildNotes: function (beats) {
         let noteIndex = 0;
-        let noteElements = _.flatMap(beats, (beat) => {
+        let noteElements = _.flatMap(beats, (beat, beatIndex) => {
             return _.map(beat.notes, (note) => {
-                let style = this.getNoteStyle(note, beat.tuplet);
+                let style = this.getNoteStyle(note, beatIndex, beat.tuplet);
                 let text = beat.tuplet || '';
 
                 if (note.error > MAX_ERROR) {
@@ -50,10 +50,10 @@ export default React.createClass({
 
         return <div>{noteElements}</div>;
     },
-    getNoteStyle: function (note, tuplet) {
+    getNoteStyle: function (note, beatIndex, tuplet) {
         let divisionCount = tuplet === 1 ? this.props.beatDivisions : tuplet;
         let divisionWidth = this.props.pxPerBeat / divisionCount;
-        let left = note.beatIndex * this.props.pxPerBeat + note.division * divisionWidth;
+        let left = beatIndex * this.props.pxPerBeat + note.division * divisionWidth;
         return {
             left
         };
