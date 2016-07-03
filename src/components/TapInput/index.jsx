@@ -18,14 +18,20 @@ export default React.createClass({
             recording: false,
             beatDivisions,
             beatsPerMeasure,
-            notes: []
+            beats: [],
+            tuplets: {
+                1: true,
+                1.5: true,
+                3: true,
+                5: false
+            }
         };
     },
     initializeTapsAndNotes: function () {
         this.firstTapTime = null;
         this.taps = [];
-        this.earlyNotes = [];
-        this.pendingNotes = [];
+        this.earlyNoteTimes = [];
+        this.pendingNoteTimes = [];
     },
     handleKeyDown: function (e) {
         if (!this.state.recording) {
@@ -59,60 +65,121 @@ export default React.createClass({
         this.taps.push(tap);
 
         if (this.taps.length === 1) {
-            if (this.earlyNotes.length > 0) {
+            if (this.earlyNoteTimes.length > 0) {
                 this.flushEarlyNotes();
             }
-        } else {
-            this.quantizeBeat(this.pendingNotes, prevTap, tap);
+        } else if (this.pendingNoteTimes.length > 0) {
+            let beat = this.quantizeBeat(
+                this.state.beatDivisions,
+                this.state.tuplets,
+                this.pendingNoteTimes,
+                prevTap,
+                tap
+            );
 
             this.setState({
-                notes: this.state.notes.concat(this.pendingNotes)
+                beats: this.state.beats.concat(beat)
             });
-            this.pendingNotes = [];
+            this.pendingNoteTimes = [];
         }
     },
     handleNote: function () {
         let time = Date.now();
 
         if (this.taps.length === 0) {
-            this.earlyNotes.push({
-                time
-            });
+            this.earlyNoteTimes.push(time);
         } else {
-            this.pendingNotes.push({
-                time: time - this.firstTapTime
-            });
+            let relativeTime = time - this.firstTapTime;
+            this.pendingNoteTimes.push(relativeTime);
         }
     },
     flushEarlyNotes: function () {
-        this.pendingNotes = _.map(this.earlyNotes, (note) => {
-            return {
-                time: note.time - this.firstTapTime
-            }
+        this.pendingNoteTimes = _.map(this.earlyNoteTimes, (noteTime) => {
+            return noteTime - this.firstTapTime;
         });
-        this.earlyNotes = [];
+        this.earlyNoteTimes = [];
     },
-    quantizeBeat: function (notes, tap1, tap2) {
+    getNoteInfo: function (beatDivisions, period, tuplet, msIntoBeat) {
+        let divisionCount = tuplet === 1 ? beatDivisions : tuplet;
+        let divisionPeriod = period / divisionCount;
+
+        let rawDivision = msIntoBeat / divisionPeriod;
+        let division = Math.round(rawDivision);
+        let error = division - rawDivision;
+        let nextBeat = division == divisionCount;
+
+        if (nextBeat) {
+            division = 0;
+        }
+
+        return {
+            division,
+            error,
+            nextBeat
+        };
+    },
+    calculateNormalizedError: function (notes) {
+        let sum = _.sumBy(notes, (note) => note.error);
+        let avg = sum / notes.length;
+        let avgDeviation = _.sumBy(notes, (note) => Math.abs(avg - note.error)) / notes.length;
+
+        // totally arbitrary.
+        return Math.abs(avg) + Math.pow(avgDeviation, 2);
+    },
+    quantizeBeat: function (beatDivisions, tuplets, noteTimes, tap1, tap2) {
+        console.log('note times', noteTimes);
+        console.log('tap1 time', tap1.time);
+        console.log('tap2 time', tap2.time);
         let period = this.getPeriod([tap1.time, tap2.time]);
-        let divisionPeriod = period / this.state.beatDivisions;
+        let activeTuplets = _(tuplets)
+           .pickBy((t) => t === true)
+           .keys()
+           .value();
+        let tupletToNotes = {};
+        let tupletToError = {};
 
+        _.forEach(activeTuplets, (tupletStr) => {
+            let tuplet = Number(tupletStr);
+            let notes = _.map(noteTimes, (noteTime) => {
+                let msIntoBeat = noteTime - tap1.time;
+
+                return this.getNoteInfo(beatDivisions, period, tuplet, msIntoBeat);
+            });
+
+            tupletToNotes[tupletStr] = notes;
+            tupletToError[tupletStr] = this.calculateNormalizedError(notes);
+        });
+
+        let bestTupletStr = _.minBy(_.keys(tupletToError), (tupletStr) => {
+            return tupletToError[tupletStr];
+        });
+        let bestTuplet = Number(bestTupletStr);
+
+        console.log('tte', tupletToError);
+        console.log('ttn', tupletToNotes);
+
+        let notes = tupletToNotes[bestTupletStr];
         _.forEach(notes, (note) => {
-            let rawDivision = (note.time - tap1.time) / divisionPeriod;
-            let division = Math.round(rawDivision);
-            let error = division - rawDivision;
-            let beatIndex;
-
-            if (division < this.state.beatDivisions) {
-                beatIndex = tap1.index;
+            if (note.nextBeat) {
+                note.beatIndex = tap2.index;
+                note.division = 0;
             } else {
-                beatIndex = tap2.index;
-                division = 0;
+                note.beatIndex = tap1.index;
             }
 
-            note.beatIndex = beatIndex;
-            note.division = division;
-            note.error = error;
+            delete note.nextBeat;
         });
+
+        if (notes.length === 1 && notes[0].division === 0) {
+            bestTuplet = 1;
+        }
+
+        console.log('notes', notes);
+
+        return {
+            notes,
+            tuplet: bestTuplet
+        };
     },
     getPeriod: function (taps) {
         let sum = 0;
@@ -140,7 +207,7 @@ export default React.createClass({
             window.clearInterval(this.intervalId);
             this.initializeTapsAndNotes();
             this.setState({
-                notes: [],
+                beats: [],
                 recording: true
             });
         }
@@ -155,7 +222,7 @@ export default React.createClass({
                     beatsPerMeasure={this.state.beatsPerMeasure}
                     beatDivisions={this.state.beatDivisions}
                     pxPerBeat={this.pxPerBeat}
-                    notes={this.state.notes}
+                    beats={this.state.beats}
                 />
                 <div>
                     <button onClick={this.toggleRecording}>{recButtonText}</button>

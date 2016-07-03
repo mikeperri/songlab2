@@ -7,7 +7,8 @@
   "scripts": {
     "build": "$(npm bin)/webpack --display-error-details",
     "start": "$(npm bin)/webpack-dev-server --content-base dist/",
-    "test": "$(npm bin)/mocha src/testSetup.js src/components/**/*.test.jsx --compilers js:babel-core/register"
+    "test": "$(npm bin)/mocha src/testSetup.js src/components/**/*.test.jsx --compilers js:babel-core/register",
+    "debug": "$(npm bin)/mocha debug src/testSetup.js src/components/**/*.test.jsx --compilers js:babel-core/register"
   },
   "author": "Mike Perri",
   "license": "ISC",

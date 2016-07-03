@@ -20,45 +20,87 @@ describe('<Input />', () => {
         beforeEach(() => {
             wrapper = mount(<Input document={mockDocument}/>);
         });
-        it('should set the beatIndex, division, and error for each note in the beat', () => {
-            wrapper.setState({
-                'beatDivisions': 4,
-                'tapTimes': [ 0, 100 ],
-                'beatTimes': [ -1, 99 ]
-            });
+        it('should quantize four quarter notes, including one that goes to the next beat', () => {
+            let beatDivisions = 4;
+            let tuplets = { 1: true, 1.5: true, 3: true };
+            let noteTimes = [ 0, 25, 50, 75, 100 ];
+            let tap1 = { time: 0, index: 5 };
+            let tap2 = { time: 100, index: 6 };
 
-            let notes = [
-                { time: 5 },
-                { time: 40 },
-                { time: 95 }
-            ];
-
-            wrapper.instance().quantizeBeat(
-                notes,
-                { time: 0, index: 5 },
-                { time: 100, index: 6 }
+            let quantized = wrapper.instance().quantizeBeat(
+                beatDivisions,
+                tuplets,
+                noteTimes,
+                tap1,
+                tap2
             );
 
-            expect(notes).to.deep.equal([
-                {
-                    time: 5,
-                    beatIndex: 5,
-                    division: 0,
-                    error: -0.2
-                },
-                {
-                    time: 40,
-                    beatIndex: 5,
-                    division: 2,
-                    error: 0.3999999999999999
-                },
-                {
-                    time: 95,
-                    beatIndex: 6,
-                    division: 0,
-                    error: 0.20000000000000018
-                }
-            ]);
+            expect(quantized).to.deep.equal({
+                tuplet: 1,
+                notes: [
+                    {
+                        division: 0,
+                        error: 0,
+                        beatIndex: 5
+                    },
+                    {
+                        division: 1,
+                        error: 0,
+                        beatIndex: 5
+                    },
+                    {
+                        division: 2,
+                        error: 0,
+                        beatIndex: 5
+                    },
+                    {
+                        division: 3,
+                        error: 0,
+                        beatIndex: 5
+                    },
+                    {
+                        division: 0,
+                        error: 0,
+                        beatIndex: 6
+                    }
+                ]
+            });
+        });
+        it('should handle a triplet', () => {
+            let beatDivisions = 4;
+            let tuplets = { 1: true, 1.5: true, 3: true };
+            let noteTimes = [ 0, 33, 66 ];
+            let tap1 = { time: 0, index: 5 };
+            let tap2 = { time: 100, index: 6 };
+
+            let quantized = wrapper.instance().quantizeBeat(
+                beatDivisions,
+                tuplets,
+                noteTimes,
+                tap1,
+                tap2
+            );
+
+            expect(quantized).to.deep.equal({
+                tuplet: 3,
+                notes: [
+                    {
+                        division: 0,
+                        error: 0,
+                        beatIndex: 5
+                    },
+                    {
+                        division: 1,
+                        error: 0.01000000000000012,
+                        beatIndex: 5
+                    },
+                    {
+                        division: 2,
+                        error: 0.02000000000000024,
+                        beatIndex: 5
+                    }
+                ]
+            });
         });
     });
     describe('once started', () => {
@@ -73,7 +115,7 @@ describe('<Input />', () => {
             clock.restore();
         });
 
-        it('should update notes after each tap (after the first)', () => {
+        it('should update beats after each tap (after the first)', () => {
             let preventDefault = sinon.spy();
 
             clock.tick(111);
@@ -86,7 +128,7 @@ describe('<Input />', () => {
             keydownCb({ key: 'a', preventDefault });
             clock.tick(50);
             keydownCb({ key: ' ', preventDefault });
-            expect(wrapper.state('notes').length).to.equal(2);
+            expect(wrapper.state('beats').length).to.equal(2);
         });
     });
 });

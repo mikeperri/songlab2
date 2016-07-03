@@ -9,7 +9,7 @@ export default React.createClass({
         beatsPerMeasure: React.PropTypes.number.isRequired,
         beatDivisions: React.PropTypes.number.isRequired,
         pxPerBeat: React.PropTypes.number.isRequired,
-        notes: React.PropTypes.array.isRequired
+        beats: React.PropTypes.array.isRequired
     },
     buildBackground: function (gridWidth) {
         let gridChildren = [];
@@ -31,24 +31,28 @@ export default React.createClass({
 
         return <div>{gridChildren}</div>;
     },
-    buildNotes: function (notes) {
-        let noteElements = _.map(notes, (note, index) => {
-            let style = this.getNoteStyle(note);
-            let text = '';
+    buildNotes: function (beats) {
+        let noteIndex = 0;
+        let noteElements = _.flatMap(beats, (beat) => {
+            return _.map(beat.notes, (note) => {
+                let style = this.getNoteStyle(note, beat.tuplet);
+                let text = beat.tuplet || '';
 
-            if (note.error > MAX_ERROR) {
-                text = '>';
-            } else if (note.error < -1 * MAX_ERROR) {
-                text = '<';
-            }
+                if (note.error > MAX_ERROR) {
+                    text += '>';
+                } else if (note.error < -1 * MAX_ERROR) {
+                    text += '<';
+                }
 
-            return <div className="grid-item note" key={index} style={style}>{text}</div>;
+                return <div className="grid-item note" key={noteIndex++} style={style}>{text}</div>;
+            });
         });
 
         return <div>{noteElements}</div>;
     },
-    getNoteStyle: function (note) {
-        let divisionWidth = this.props.pxPerBeat / this.props.beatDivisions;
+    getNoteStyle: function (note, tuplet) {
+        let divisionCount = tuplet === 1 ? this.props.beatDivisions : tuplet;
+        let divisionWidth = this.props.pxPerBeat / divisionCount;
         let left = note.beatIndex * this.props.pxPerBeat + note.division * divisionWidth;
         return {
             left
@@ -59,7 +63,7 @@ export default React.createClass({
         let gridHeight = 200;
 
         let background = this.buildBackground(gridWidth);
-        let notes = this.buildNotes(this.props.notes);
+        let notes = this.buildNotes(this.props.beats);
 
         return (
             <div className="note-grid" style={{ width: gridWidth, height: gridHeight}}>
