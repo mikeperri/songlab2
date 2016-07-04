@@ -35,19 +35,19 @@ export default React.createClass({
         this.nextBeatNotes = [];
     },
     handleKeyDown: function (e) {
-        if (!this.state.recording) {
-            return;
-        } else if (e.key === 'Escape') {
-            this.toggleRecording();
-        } else {
+        if (this.state.recording) {
+            if (e.key === 'Escape') {
+                this.toggleRecording();
+            } else if (e.key === ' ') {
+                this.handleTap();
+            } else {
+                this.handleNote();
+            }
             e.preventDefault();
+        } else if (e.key === 'F9') {
+            this.toggleRecording();
         }
 
-        if (e.key === ' ') {
-            this.handleTap();
-        } else {
-            this.handleNote();
-        }
     },
     handleTap: function () {
         let time = Date.now();
