@@ -12,7 +12,7 @@
 .note-grid .grid-item.note {
     height: 50%;
     top: 25%;
-    background: rgb(255, 0, 255);
+    background: rgba(55, 54, 145, 0.75);
     width: 11px;
     margin-left: -5px;
     border-radius: 2px;

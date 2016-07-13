@@ -4,6 +4,8 @@ import _ from 'lodash';
 import NoteGrid from '../NoteGrid';
 import Beat from './Beat';
 
+const PX_PER_BEAT = 100;
+
 export default React.createClass({
     getInitialState: function () {
         let beatDivisions = 4;
@@ -11,9 +13,10 @@ export default React.createClass({
 
         this.intervalId = null;
         this.measures = 2;
-        this.pxPerBeat = 100;
 
         this.initializeTapsAndNotes();
+
+        let beats = _.times(this.measures * beatsPerMeasure, () => new Beat({}));
 
         return {
             recording: false,
@@ -139,7 +142,7 @@ export default React.createClass({
     },
     quantizeBeat: function (beatDivisions, tuplets, noteTimes, tap1, tap2) {
         if (noteTimes.length === 0) {
-            return new Beat([], [], 1);
+            return new Beat({});
         }
 
         let period = this.getPeriod([tap1.time, tap2.time]);
@@ -168,7 +171,7 @@ export default React.createClass({
         let nextBeatNotes = _.filter(notes, { 'nextBeat': true });
         notes.splice(notes.length - nextBeatNotes.length);
 
-        return new Beat(notes, nextBeatNotes, bestTuplet);
+        return new Beat({ notes, nextBeatNotes, tuplet: bestTuplet });
     },
     getPeriod: function (taps) {
         let sum = 0;
@@ -201,6 +204,11 @@ export default React.createClass({
             });
         }
     },
+    setBeats: function (beats) {
+        this.setState({
+            beats
+        });
+    },
     render: function () {
         let recButtonText = this.state.recording ? 'Stop' : 'Start';
 
@@ -210,8 +218,9 @@ export default React.createClass({
                     measures={this.measures}
                     beatsPerMeasure={this.state.beatsPerMeasure}
                     beatDivisions={this.state.beatDivisions}
-                    pxPerBeat={this.pxPerBeat}
+                    pxPerBeat={PX_PER_BEAT}
                     beats={this.state.beats}
+                    setBeats={this.setBeats}
                 />
                 <div>
                     <button onClick={this.toggleRecording}>{recButtonText}</button>
