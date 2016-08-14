@@ -1,4 +1,6 @@
 import React from 'react';
+import { connect } from 'react-redux';
+import { setBeats, appendBeats } from '../../actions';
 import _ from 'lodash';
 
 import NoteGrid from '../NoteGrid';
@@ -6,7 +8,7 @@ import Beat from './Beat';
 
 const PX_PER_BEAT = 100;
 
-export default React.createClass({
+let TapInput = React.createClass({
     getInitialState: function () {
         let beatDivisions = 4;
         let beatsPerMeasure = 4;
@@ -82,9 +84,7 @@ export default React.createClass({
             beat.notes = beat.notes.concat(this.nextBeatNotes);
             this.nextBeatNotes = beat.nextBeatNotes;
 
-            this.setState({
-                beats: this.state.beats.concat(beat)
-            });
+            this.props.dispatch(appendBeats([beat]));
             this.pendingNoteTimes = [];
         }
     },
@@ -198,8 +198,9 @@ export default React.createClass({
         } else {
             window.clearInterval(this.intervalId);
             this.initializeTapsAndNotes();
+
+            this.props.dispatch(setBeats([]));
             this.setState({
-                beats: [],
                 recording: true
             });
         }
@@ -214,18 +215,10 @@ export default React.createClass({
 
         return (
             <div className="tap-input">
-                <NoteGrid
-                    measures={this.measures}
-                    beatsPerMeasure={this.state.beatsPerMeasure}
-                    beatDivisions={this.state.beatDivisions}
-                    pxPerBeat={PX_PER_BEAT}
-                    beats={this.state.beats}
-                    setBeats={this.setBeats}
-                />
-                <div>
-                    <button onClick={this.toggleRecording}>{recButtonText}</button>
-                </div>
+                <button onClick={this.toggleRecording}>{recButtonText}</button>
             </div>
         );
     }
 });
+
+export default connect()(TapInput);

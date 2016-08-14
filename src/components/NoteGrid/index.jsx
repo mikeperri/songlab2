@@ -11,7 +11,7 @@ export default React.createClass({
         beatDivisions: React.PropTypes.number.isRequired,
         pxPerBeat: React.PropTypes.number.isRequired,
         beats: React.PropTypes.array.isRequired,
-        setBeats: React.PropTypes.func.isRequired
+        onNoteMove: React.PropTypes.func
     },
     getNumberOfDivisions: function (tuplet) {
         return tuplet === 1 ? this.props.beatDivisions : tuplet;
@@ -116,7 +116,7 @@ export default React.createClass({
             let srcBeatIndex = dtParts[0];
             let srcNoteIndex = dtParts[1];
 
-            let beats = this.props.beats;
+            let beats = _.cloneDeep(this.props.beats);
             let srcBeat = beats[srcBeatIndex];
             let destBeat = beats[destBeatIndex];
             let note = beats[srcBeatIndex].notes[srcNoteIndex];
@@ -125,15 +125,15 @@ export default React.createClass({
             let tuplet = 1; // todo
 
             if (!existingNoteAtSameDivision) {
+
                 note.division = destDivision;
 
                 if (Number(destBeatIndex) !== Number(srcBeatIndex)) {
                     _.pull(srcBeat.notes, note);
                     destBeat.notes.push(note);
-                    //_.sortBy(destBeat, 'division');
                 }
 
-                this.props.setBeats(beats);
+                this.props.onNoteMove(beats);
             }
         }
     },
