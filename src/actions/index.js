@@ -18,5 +18,19 @@ export const appendBeats = (beats) => {
     return {
         type: types.APPEND_BEATS,
         beats
-    }
+    };
+};
+
+export const addToPitchOffset = (delta) => {
+    return {
+        type: types.ADD_TO_PITCH_OFFSET,
+        delta
+    };
+};
+
+export const setMode = (mode) => {
+    return {
+        type: types.SET_MODE,
+        mode
+    };
 };

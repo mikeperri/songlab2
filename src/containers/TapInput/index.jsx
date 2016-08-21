@@ -1,7 +1,7 @@
 import React from 'react';
+import _ from 'lodash';
 import { connect } from 'react-redux';
 import { setBeats, appendBeats, setRecording } from '../../actions';
-import _ from 'lodash';
 
 import NoteGrid from '../../components/NoteGrid';
 import Beat from './Beat';

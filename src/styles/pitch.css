@@ -1,0 +1,18 @@
+.pitch-selector {
+    height: 390px;
+    overflow-y: scroll;
+}
+
+.pitch-selector .pitch-row {
+    display: block;
+    color: #fff;
+    background: #1b1054;
+    height: 30px;
+    line-height: 30px;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.pitch-selector .pitch-row:nth-child(even) {
+    background: #5e50a7;
+}
