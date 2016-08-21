@@ -1,9 +1,9 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { setBeats, appendBeats } from '../../actions';
+import { setBeats, appendBeats, setRecording } from '../../actions';
 import _ from 'lodash';
 
-import NoteGrid from '../NoteGrid';
+import NoteGrid from '../../components/NoteGrid';
 import Beat from './Beat';
 
 const PX_PER_BEAT = 100;
@@ -40,17 +40,15 @@ let TapInput = React.createClass({
         this.nextBeatNotes = [];
     },
     handleKeyDown: function (e) {
-        if (this.state.recording) {
+        if (this.props.recording) {
             if (e.key === 'Escape') {
-                this.toggleRecording();
+                this.stopRecording();
             } else if (e.key === ' ') {
                 this.handleTap();
             } else {
                 this.handleNote();
             }
             e.preventDefault();
-        } else if (e.key === 'F9') {
-            this.toggleRecording();
         }
 
     },
@@ -84,7 +82,7 @@ let TapInput = React.createClass({
             beat.notes = beat.notes.concat(this.nextBeatNotes);
             this.nextBeatNotes = beat.nextBeatNotes;
 
-            this.props.dispatch(appendBeats([beat]));
+            this.props.onAppendBeat(beat);
             this.pendingNoteTimes = [];
         }
     },
@@ -181,7 +179,16 @@ let TapInput = React.createClass({
         }
         return sum / (taps.length - 1);
     },
-    intervalCb: function () {
+    startRecording: function () {
+        if (this.props.hasBeats) {
+            this.props.onClearBeats();
+        }
+
+        this.props.onStartRecording();
+    },
+    stopRecording: function () {
+        this.initializeTapsAndNotes();
+        this.props.onStopRecording();
     },
     componentDidMount: function () {
         this.props.document.addEventListener('keydown', this.handleKeyDown);
@@ -189,36 +196,43 @@ let TapInput = React.createClass({
     componentWillUnmount: function () {
         this.props.document.removeEventListener('keydown', this.handleKeyDown);
     },
-    toggleRecording: function () {
-        if (this.state.recording) {
-            this.setState({
-                recording: false
-            });
-            this.intervalId = window.setInterval(this.intervalCb);
-        } else {
-            window.clearInterval(this.intervalId);
-            this.initializeTapsAndNotes();
-
-            this.props.dispatch(setBeats([]));
-            this.setState({
-                recording: true
-            });
-        }
-    },
-    setBeats: function (beats) {
-        this.setState({
-            beats
-        });
-    },
     render: function () {
-        let recButtonText = this.state.recording ? 'Stop' : 'Start';
-
         return (
             <div className="tap-input">
-                <button onClick={this.toggleRecording}>{recButtonText}</button>
+                <button onClick={this.startRecording} disabled={!this.props.canStartRecording}>Start</button>
+                <button onClick={this.stopRecording} disabled={!this.props.canStopRecording}>Stop</button>
             </div>
         );
     }
 });
 
-export default connect()(TapInput);
+const mapStateToProps = (state) => {
+    return {
+        recording: state.recording,
+        canStartRecording: !state.recording,
+        canStopRecording: state.recording,
+        hasBeats: !!state.beats.present.length
+    };
+};
+
+const mapDispatchToProps = (dispatch) => {
+    return {
+        onStartRecording: () => {
+            dispatch(setRecording(true));
+        },
+        onStopRecording: () => {
+            dispatch(setRecording(false));
+        },
+        onClearBeats: (beat) => {
+            dispatch(setBeats([]));
+        },
+        onAppendBeat: (beat) => {
+            dispatch(appendBeats([beat]));
+        }
+    };
+};
+
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(TapInput);

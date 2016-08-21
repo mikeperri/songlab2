@@ -8,7 +8,7 @@ const mapStateToProps = (state) => {
         beatsPerMeasure: 4,
         beatDivisions: 4,
         pxPerBeat: 100,
-        beats: state.beats
+        beats: state.beats.present
     };
 };
 

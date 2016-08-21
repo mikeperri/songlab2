@@ -1,3 +1,5 @@
+import undoable, { distinctState } from 'redux-undo';
+
 const beatsReducer = (state = [], action) => {
     switch (action.type) {
         case 'SET_BEATS':
@@ -9,4 +11,8 @@ const beatsReducer = (state = [], action) => {
     }
 };
 
-export default beatsReducer;
+const undoableBeatsReducer = undoable(beatsReducer, {
+    filter: distinctState()
+});
+
+export default undoableBeatsReducer;

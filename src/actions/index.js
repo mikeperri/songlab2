@@ -1,5 +1,12 @@
 import types from './types';
 
+export const setRecording = (recording) => {
+    return {
+        type: types.SET_RECORDING,
+        recording
+    };
+};
+
 export const setBeats = (beats) => {
     return {
         type: types.SET_BEATS,
@@ -12,4 +19,4 @@ export const appendBeats = (beats) => {
         type: types.APPEND_BEATS,
         beats
     }
-}
+};
