@@ -11,12 +11,15 @@ export default React.createClass({
             tracks: NoteGridView.propTypes.tracks
         })
     },
+    getNumberOfBeats: function () {
+        return 4;
+    },
     render: function () {
         let measure = this.props.measure;
         let lowerPitchLimit = this.props.lowerPitchLimit;
         let upperPitchLimit = this.props.upperPitchLimit;
 
-        let numberOfBeats = _.get(_.maxBy(measure.tracks, (track) => _.get(track, 'beats.length')), 'beats.length') || 0;
+        let numberOfBeats = this.getNumberOfBeats();
 
         return (
             <div className="measure">
