@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import EditableNoteGrid from '../EditableNoteGrid';
+import EditableRhythmGrid from '../EditableRhythmGrid';
 import UndoRedo from '../UndoRedo';
 import TapInput from '../TapInput/';
 import PitchSelector from '../PitchSelector';
@@ -14,7 +14,7 @@ let Editor = React.createClass({
         if (mode === MODES.RHYTHM) {
             return (
                 <div className="editor">
-                    <EditableNoteGrid />
+                    <EditableRhythmGrid />
                     <UndoRedo />
                     <TapInput document={this.props.document}/>
                     <button onClick={this.props.onNext}>Next</button>
@@ -24,7 +24,7 @@ let Editor = React.createClass({
             return (
                 <div className="editor">
                     <PitchSelector />
-                    <EditableNoteGrid />
+                    <EditableRhythmGrid />
                     <button onClick={this.props.onPrev}>Prev</button>
                 </div>
             );

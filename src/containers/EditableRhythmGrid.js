@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
 import { setBeats } from '../actions';
-import NoteGrid from '../components/NoteGrid';
+import RhythmGridView from '../components/RhythmGridView';
 
 const mapStateToProps = (state) => {
     return {
@@ -20,9 +20,9 @@ const mapDispatchToProps = (dispatch) => {
     };
 };
 
-const EditableNoteGrid = connect(
+const EditableRhythmGrid = connect(
     mapStateToProps,
     mapDispatchToProps
-)(NoteGrid);
+)(RhythmGridView);
 
-export default EditableNoteGrid;
+export default EditableRhythmGrid;

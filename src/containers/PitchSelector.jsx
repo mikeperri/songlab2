@@ -3,7 +3,7 @@ import { findDOMNode } from 'react-dom';
 import _ from 'lodash';
 import { addToPitchOffset } from '../actions';
 import { connect } from 'react-redux';
-import NoteGrid from '../components/NoteGrid';
+import RhythmGridView from '../components/RhythmGridView';
 
 const PITCH_ROW_HEIGHT = 30;
 const ROWS = 36;

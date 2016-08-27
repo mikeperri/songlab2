@@ -3,7 +3,7 @@ import _ from 'lodash';
 import { connect } from 'react-redux';
 import { setBeats, appendBeats, setRecording } from '../../actions';
 
-import NoteGrid from '../../components/NoteGrid';
+import RhythmGridView from '../../components/RhythmGridView';
 import Beat from './Beat';
 
 const PX_PER_BEAT = 100;

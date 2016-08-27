@@ -12,16 +12,29 @@ let testSong = {
             {
                 beats: [
                 {
-                    tuplet: 1,
+                    tuplet: 4,
                     notes: [
                     {
                         division: 0,
-                        pitch: 'C'
+                        pitch: 21
+                    },
+                    {
+                        division: 1,
+                        pitch: 23
+                    },
+                    {
+                        division: 3,
+                        pitch: 25
                     }
                     ]
                 }
                 ]
             }
+            ]
+        },
+        {
+            chord: 'G',
+            tracks: [
             ]
         }
         ]
@@ -31,9 +44,14 @@ let testSong = {
 
 export default React.createClass({
     render: function () {
+        let lowerPitchLimit = 21;
+        let upperPitchLimit = 35;
+
         return (
             <div>
-                <SongView song={testSong} />
+                <SongView song={testSong}
+                    lowerPitchLimit={lowerPitchLimit}
+                    upperPitchLimit={upperPitchLimit}/>
             </div>
         );
     }

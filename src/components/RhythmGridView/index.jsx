@@ -147,7 +147,7 @@ export default React.createClass({
         let notes = this.buildNotes(gridWidth, this.props.beats);
 
         return (
-            <div className="note-grid"
+            <div className="rhythm-grid"
                 style={{ width: gridWidth, height: gridHeight}}>
                 {background}
                 {notes}

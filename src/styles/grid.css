@@ -2,14 +2,18 @@
     position: relative;
 }
 
-.note-grid .grid-item {
+.rhythm-grid {
+    position: relative;
+}
+
+.rhythm-grid .grid-item {
     position: absolute;
     height: 100%;
     width: 1px;
     border: 0;
 }
 
-.note-grid .grid-item.note {
+.rhythm-grid .grid-item.note {
     height: 50%;
     top: 25%;
     background: rgba(55, 54, 145, 0.75);
