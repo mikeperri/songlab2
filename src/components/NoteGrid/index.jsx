@@ -82,6 +82,8 @@ export default React.createClass({
                     text = '';
                 }
 
+                text += note.pitch;
+
                 let dragHandler = _.partial(this.dragHandler, beatIndex, noteIndex);
 
                 return <div onDragStart={dragHandler} className="grid-item note" draggable="true" key={overallIndex++} style={style}>{text}</div>;

@@ -118,7 +118,8 @@ let TapInput = React.createClass({
         return {
             division,
             error,
-            nextBeat
+            nextBeat,
+            pitch: 'N'
         };
     },
     calculateNormalizedError: function (notes) {
