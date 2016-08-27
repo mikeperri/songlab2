@@ -34,3 +34,10 @@ export const setMode = (mode) => {
         mode
     };
 };
+
+export const addChord = (chord) => {
+    return {
+        type: types.ADD_CHORD,
+        chord
+    };
+};

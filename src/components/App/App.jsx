@@ -1,6 +1,6 @@
 import React from 'react';
 import Editor from '../../containers/Editor/';
-import SongView from '../SongView/';
+import EditableSong from '../../containers/EditableSong/';
 
 let testSong = {
     sections: [
@@ -49,9 +49,7 @@ export default React.createClass({
 
         return (
             <div>
-                <SongView song={testSong}
-                    lowerPitchLimit={lowerPitchLimit}
-                    upperPitchLimit={upperPitchLimit}/>
+                <EditableSong document={document} />
             </div>
         );
     }
