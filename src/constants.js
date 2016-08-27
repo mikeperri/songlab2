@@ -1,6 +1,7 @@
 let sharpNotes = [ 'A', 'A#', 'B', 'C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#' ];
 let flatNotes = [ 'A', 'Bb', 'B', 'C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab' ];
 let majorScaleIndices = [ 0, 2, 4, 5, 7, 9, 11 ];
+let majorScaleChordTypes = [ '', 'm', 'm', '', '', 'm', 'dim' ];
 let noteNameToChromaticIndex = {
     'A': 0,
     'A#': 1,
@@ -21,4 +22,10 @@ let noteNameToChromaticIndex = {
     'Ab': 11
 };
 
-export { sharpNotes, flatNotes, majorScaleIndices, noteNameToChromaticIndex };
+export {
+    sharpNotes,
+    flatNotes,
+    majorScaleIndices,
+    majorScaleChordTypes,
+    noteNameToChromaticIndex
+};
