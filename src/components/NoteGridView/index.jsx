@@ -5,7 +5,8 @@ import _ from 'lodash';
 
 export default React.createClass({
     propTypes: {
-        numberOfBeats: React.PropTypes.number,
+        numberOfBeats: React.PropTypes.number.isRequired,
+        beatWidth: React.PropTypes.number.isRequired,
         tracks: React.PropTypes.arrayOf(React.PropTypes.shape({
             beats: React.PropTypes.arrayOf(React.PropTypes.shape({
                 tuplet: React.PropTypes.number,
@@ -20,11 +21,11 @@ export default React.createClass({
     },
     render: function () {
         let numberOfBeats = this.props.numberOfBeats;
+        let beatWidth = this.props.beatWidth;
         let tracks = this.props.tracks;
         let lowerPitchLimit = this.props.lowerPitchLimit;
         let upperPitchLimit = this.props.upperPitchLimit;
         let notes = [];
-        let beatWidth = 50;
         let height = 200;
         let noteGridStyle = {
             height,

@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import _ from 'lodash';
 import SongView from '../../components/SongView/';
-import { addChord } from '../../actions/';
+import { addChord, selectionLeft, selectionRight, selectionUp, selectionDown } from '../../actions/';
 import keyboardEventToDegree from '../../utils/keyboardEventToDegree.js';
 import getChordForDegree, { CHORD_MODIFIERS } from '../../utils/getChordForDegree.js';
 
@@ -16,6 +16,18 @@ const mapDispatchToProps = (dispatch) => {
     return {
         onAddChord: (chord) => {
             dispatch(addChord(chord));
+        },
+        onSelectionLeft: () => {
+            dispatch(selectionLeft());
+        },
+        onSelectionRight: () => {
+            dispatch(selectionRight());
+        },
+        onSelectionUp: () => {
+            dispatch(selectionUp());
+        },
+        onSelectionDown: () => {
+            dispatch(selectionDown());
         }
     };
 };
@@ -33,6 +45,14 @@ const EditableSong = React.createClass({
             downKeyActive = true;
             e.preventDefault();
             return;
+        } else if (e.key === 'h') {
+            this.props.onSelectionLeft();
+        } else if (e.key === 'l') {
+            this.props.onSelectionRight();
+        } else if (e.key === 'j') {
+            this.props.onSelectionDown();
+        } else if (e.key === 'k') {
+            this.props.onSelectionUp();
         }
 
         let degree = keyboardEventToDegree(e);

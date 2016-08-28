@@ -1,11 +1,16 @@
 import React from 'react';
 import Editor from '../../containers/Editor/';
-import SectionView from '../SectionView/';
+import MeasureView from '../MeasureView/';
 
 export default React.createClass({
     propTypes: {
         song: React.PropTypes.shape({
-            sections: SectionView.propTypes.sections
+            key: React.PropTypes.string,
+            measures: React.PropTypes.arrayOf(React.PropTypes.shape({
+                measure: MeasureView.propTypes.measure
+            })),
+            selectedMeasureIndex: React.PropTypes.number,
+            selectedBeatIndex: React.PropTypes.number,
         })
     },
     render: function () {
@@ -13,9 +18,18 @@ export default React.createClass({
         let lowerPitchLimit = 21;
         let upperPitchLimit = 33;
 
-        let sectionElements = song.sections.map((section, index) => {
-            return <SectionView
-                        section={section}
+        let measureElements = song.measures.map((measure, index) => {
+            let selection;
+
+            if (index === song.selectedMeasureIndex) {
+                selection = {
+                    measure: (song.selectedBeatIndex === null),
+                    beatIndex: song.selectedBeatIndex
+                };
+            }
+
+            return <MeasureView measure={measure}
+                        selection={selection}
                         key={index}
                         lowerPitchLimit={lowerPitchLimit}
                         upperPitchLimit={upperPitchLimit} />
@@ -23,7 +37,7 @@ export default React.createClass({
 
         return (
             <div className="song">
-                {sectionElements}
+                {measureElements}
             </div>
         );
     }

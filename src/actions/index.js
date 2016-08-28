@@ -41,3 +41,27 @@ export const addChord = (chord) => {
         chord
     };
 };
+
+export const selectionLeft = () => {
+    return {
+        type: types.SELECTION_LEFT
+    };
+};
+
+export const selectionRight = () => {
+    return {
+        type: types.SELECTION_RIGHT
+    };
+};
+
+export const selectionUp = () => {
+    return {
+        type: types.SELECTION_UP
+    };
+};
+
+export const selectionDown = () => {
+    return {
+        type: types.SELECTION_DOWN
+    };
+};
