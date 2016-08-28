@@ -1,8 +1,18 @@
-let sharpNotes = [ 'A', 'A#', 'B', 'C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#' ];
-let flatNotes = [ 'A', 'Bb', 'B', 'C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab' ];
-let majorScaleIndices = [ 0, 2, 4, 5, 7, 9, 11 ];
-let majorScaleChordTypes = [ '', 'm', 'm', '', '', 'm', 'dim' ];
-let noteNameToChromaticIndex = {
+let SHARP_NOTE_NAMES = [ 'A', 'A#', 'B', 'C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#' ];
+let FLAT_NOTE_NAMES = [ 'A', 'Bb', 'B', 'C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab' ];
+let NOTE_MODIFIERS = {
+    NATURAL: 0,
+    FLAT: 1,
+    SHARP: 2
+};
+let MAJOR_SCALE_INDICES = [ 0, 2, 4, 5, 7, 9, 11 ];
+let CHORD_TYPES = {
+    MAJOR: '',
+    MINOR: 'm',
+    DIMINISHED: 'dim'
+};
+let MAJOR_SCALE_CHORD_TYPES = [ CHORD_TYPES.MAJOR, CHORD_TYPES.MINOR, CHORD_TYPES.MINOR, CHORD_TYPES.MAJOR, CHORD_TYPES.MAJOR, CHORD_TYPES.MINOR, CHORD_TYPES.DIMINISHED ];
+let NOTE_NAME_TO_CHROMATIC_INDEX = {
     'A': 0,
     'A#': 1,
     'Bb': 1,
@@ -23,9 +33,11 @@ let noteNameToChromaticIndex = {
 };
 
 export {
-    sharpNotes,
-    flatNotes,
-    majorScaleIndices,
-    majorScaleChordTypes,
-    noteNameToChromaticIndex
+    SHARP_NOTE_NAMES,
+    FLAT_NOTE_NAMES,
+    NOTE_MODIFIERS,
+    MAJOR_SCALE_INDICES,
+    CHORD_TYPES,
+    MAJOR_SCALE_CHORD_TYPES,
+    NOTE_NAME_TO_CHROMATIC_INDEX
 };
