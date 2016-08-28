@@ -99,6 +99,18 @@ const songReducer = (state = defaultSong, action) => {
         } else {
             return state;
         }
+    } else if (action.type === 'DELETE_MEASURE') {
+        let newSong = _.clone(state);
+
+        newSong.measures = state.measures.filter((measure, index) => index !== action.measureIndex);
+
+        if (action.measureIndex < state.selectedMeasureIndex) {
+            newSong.selectedMeasureIndex--;
+        } else if (state.selectedMeasureIndex >= newSong.measures.length) {
+            newSong.selectedMeasureIndex = newSong.measures.length - 1;
+        }
+
+        return newSong;
     } else {
         return state;
     }

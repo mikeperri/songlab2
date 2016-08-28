@@ -65,3 +65,10 @@ export const selectionDown = () => {
         type: types.SELECTION_DOWN
     };
 };
+
+export const deleteMeasure = (measureIndex) => {
+    return {
+        type: types.DELETE_MEASURE,
+        measureIndex
+    };
+};

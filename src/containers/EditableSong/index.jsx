@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import _ from 'lodash';
 import SongView from '../../components/SongView/';
-import { addChord, selectionLeft, selectionRight, selectionUp, selectionDown } from '../../actions/';
+import { addChord, selectionLeft, selectionRight, selectionUp, selectionDown, deleteMeasure } from '../../actions/';
 import keyboardEventToDegree from '../../utils/keyboardEventToDegree.js';
 import getChordForDegree, { CHORD_MODIFIERS } from '../../utils/getChordForDegree.js';
 
@@ -28,6 +28,9 @@ const mapDispatchToProps = (dispatch) => {
         },
         onSelectionDown: () => {
             dispatch(selectionDown());
+        },
+        onDeleteMeasure: (measureIndex) => {
+            dispatch(deleteMeasure(measureIndex));
         }
     };
 };
@@ -53,6 +56,8 @@ const EditableSong = React.createClass({
             this.props.onSelectionDown();
         } else if (e.key === 'k') {
             this.props.onSelectionUp();
+        } else if (e.key === 'x') {
+            this.props.onDeleteMeasure(this.props.song.selectedMeasureIndex);
         }
 
         let degree = keyboardEventToDegree(e);
