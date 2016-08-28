@@ -29,7 +29,6 @@ export default React.createClass({
         if (selection) {
             if (selection.measure === true) {
                 let selectionStyle = {
-                    position: 'absolute',
                     top: 0,
                     left: 0,
                     right: 0
@@ -37,7 +36,6 @@ export default React.createClass({
                 selectionElement = <div className="selection" style={selectionStyle}></div>;
             } else {
                 let selectionStyle = {
-                    position: 'absolute',
                     top: 5,
                     left: selection.beatIndex * beatWidth,
                     width: beatWidth

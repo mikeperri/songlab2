@@ -4,7 +4,16 @@
 }
 
 .song .selection {
+    position: absolute;
     border: 1px solid black;
     border-bottom: 0;
     height: 5px;
+}
+
+.song .measure.placeholder {
+    vertical-align: top;
+}
+
+.song .measure.placeholder .selection {
+    width: 50px;
 }

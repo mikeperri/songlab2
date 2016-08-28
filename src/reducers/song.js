@@ -20,6 +20,7 @@ const songReducer = (state = defaultSong, action) => {
         return newSong;
     } else if (action.type === 'SELECTION_LEFT') {
         let newSong = _.clone(state);
+        let selectedMeasure = newSong.measures[state.selectedMeasureIndex];
 
         function tryToDecrementMeasure() {
             if (state.selectedMeasureIndex > 0) {
@@ -31,17 +32,13 @@ const songReducer = (state = defaultSong, action) => {
         }
 
         if (state.selectedBeatIndex !== null) {
-            let selectedMeasure = newSong.measures[state.selectedMeasureIndex];
-
-            if (selectedMeasure) {
-                if (state.selectedBeatIndex > 0) {
-                    newSong.selectedBeatIndex--;
-                } else {
-                    let decremented = tryToDecrementMeasure();
-                    if (decremented) {
-                        selectedMeasure = newSong.measures[newSong.selectedMeasureIndex];
-                        newSong.selectedBeatIndex = selectedMeasure.numberOfBeats - 1;
-                    }
+            if (state.selectedBeatIndex > 0) {
+                newSong.selectedBeatIndex--;
+            } else {
+                let decremented = tryToDecrementMeasure();
+                if (decremented) {
+                    selectedMeasure = newSong.measures[newSong.selectedMeasureIndex];
+                    newSong.selectedBeatIndex = selectedMeasure.numberOfBeats - 1;
                 }
             }
         } else {
@@ -51,9 +48,10 @@ const songReducer = (state = defaultSong, action) => {
         return newSong;
     } else if (action.type === 'SELECTION_RIGHT') {
         let newSong = _.clone(state);
+        let selectedMeasure = newSong.measures[state.selectedMeasureIndex];
 
         function tryToIncrementMeasure() {
-            if (state.selectedMeasureIndex < state.measures.length - 1) {
+            if (state.selectedMeasureIndex < state.measures.length) {
                 newSong.selectedMeasureIndex++;
                 return true;
             } else {
@@ -61,17 +59,13 @@ const songReducer = (state = defaultSong, action) => {
             }
         }
 
-        if (state.selectedBeatIndex !== null) {
-            let selectedMeasure = newSong.measures[state.selectedMeasureIndex];
-
-            if (selectedMeasure) {
-                if (state.selectedBeatIndex < selectedMeasure.numberOfBeats - 1) {
-                    newSong.selectedBeatIndex++;
-                } else {
-                    let incremented = tryToIncrementMeasure();
-                    if (incremented) {
-                        newSong.selectedBeatIndex = 0;
-                    }
+        if (state.selectedBeatIndex !== null && selectedMeasure) {
+            if (state.selectedBeatIndex < selectedMeasure.numberOfBeats - 1) {
+                newSong.selectedBeatIndex++;
+            } else {
+                let incremented = tryToIncrementMeasure();
+                if (incremented) {
+                    newSong.selectedBeatIndex = 0;
                 }
             }
         } else {
@@ -106,7 +100,7 @@ const songReducer = (state = defaultSong, action) => {
 
         if (action.measureIndex < state.selectedMeasureIndex) {
             newSong.selectedMeasureIndex--;
-        } else if (state.selectedMeasureIndex >= newSong.measures.length) {
+        } else if (state.selectedMeasureIndex > newSong.measures.length) {
             newSong.selectedMeasureIndex = newSong.measures.length - 1;
         }
 

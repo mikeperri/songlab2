@@ -35,9 +35,24 @@ export default React.createClass({
                         upperPitchLimit={upperPitchLimit} />
         });
 
+        let placeholderSelection = null;
+
+        if (song.selectedMeasureIndex === song.measures.length) {
+            let selectionStyle = {};
+
+            if (song.selectedBeatIndex !== null) {
+                selectionStyle.top = 5;
+            }
+
+            placeholderSelection = <div style={selectionStyle} className="selection"></div>;
+        }
+
         return (
             <div className="song">
                 {measureElements}
+                <div className="measure placeholder">
+                    {placeholderSelection}
+                </div>
             </div>
         );
     }
