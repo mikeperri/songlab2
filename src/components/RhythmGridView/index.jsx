@@ -6,7 +6,7 @@ const MAX_ERROR = 100;
 
 export default React.createClass({
     propTypes: {
-        measures: React.PropTypes.number.isRequired,
+        numberOfMeasures: React.PropTypes.number.isRequired,
         beatsPerMeasure: React.PropTypes.number.isRequired,
         beatDivisions: React.PropTypes.number.isRequired,
         pxPerBeat: React.PropTypes.number.isRequired,
@@ -16,7 +16,7 @@ export default React.createClass({
     getNumberOfDivisions: function (tuplet) {
         return tuplet === 1 ? this.props.beatDivisions : tuplet;
     },
-    buildBackground: function (gridWidth, beats) {
+    buildBackground: function (beats) {
         let gridChildren = [];
         let numberOfBeats = beats.length;
         let key = 0;
@@ -67,7 +67,7 @@ export default React.createClass({
 
         return <div>{gridChildren}</div>;
     },
-    buildNotes: function (gridWidth, beats) {
+    buildNotes: function (beats) {
         let overallIndex = 0;
         let noteElements = _.flatMap(beats, (beat, beatIndex) => {
             return _.map(beat.notes, (note, noteIndex) => {
@@ -140,15 +140,14 @@ export default React.createClass({
         }
     },
     render: function () {
-        let gridWidth = (this.props.measures + 1) * this.props.beatsPerMeasure * this.props.pxPerBeat;
         let gridHeight = 200;
 
-        let background = this.buildBackground(gridWidth, this.props.beats);
-        let notes = this.buildNotes(gridWidth, this.props.beats);
+        let background = this.buildBackground(this.props.beats);
+        let notes = this.buildNotes(this.props.beats);
 
         return (
             <div className="rhythm-grid"
-                style={{ width: gridWidth, height: gridHeight}}>
+                style={{ height: gridHeight}}>
                 {background}
                 {notes}
             </div>

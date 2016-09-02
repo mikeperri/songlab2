@@ -50,6 +50,7 @@ export default React.createClass({
         return (
             <div>
                 <EditableSong document={document} />
+                <Editor document={document} />
             </div>
         );
     }

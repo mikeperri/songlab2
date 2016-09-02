@@ -4,7 +4,7 @@ import RhythmGridView from '../components/RhythmGridView';
 
 const mapStateToProps = (state) => {
     return {
-        measures: 2,
+        numberOfMeasures: 2,
         beatsPerMeasure: 4,
         beatDivisions: 4,
         pxPerBeat: 100,

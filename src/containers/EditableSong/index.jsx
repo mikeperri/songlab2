@@ -2,9 +2,17 @@ import React from 'react';
 import { connect } from 'react-redux';
 import _ from 'lodash';
 import SongView from '../../components/SongView/';
-import { addChord, selectionLeft, selectionRight, selectionUp, selectionDown, deleteMeasure } from '../../actions/';
 import keyboardEventToDegree from '../../utils/keyboardEventToDegree.js';
 import getChordForDegree, { CHORD_MODIFIERS } from '../../utils/getChordForDegree.js';
+import {
+    addChord,
+    selectionLeft,
+    selectionRight,
+    selectionUp,
+    selectionDown,
+    deleteMeasure,
+    deleteChord
+} from '../../actions/';
 
 const mapStateToProps = (state) => {
     return {
@@ -31,6 +39,9 @@ const mapDispatchToProps = (dispatch) => {
         },
         onDeleteMeasure: (measureIndex) => {
             dispatch(deleteMeasure(measureIndex));
+        },
+        onDeleteChord: (measureIndex, beatIndex) => {
+            dispatch(deleteChord(measureIndex, beatIndex));
         }
     };
 };
@@ -40,24 +51,31 @@ let downKeyActive = false;
 
 const EditableSong = React.createClass({
     handleKeyDown: function (e) {
-        if (e.key === 'ArrowUp' || e.keyCode === 38) {
+        if (e.key.toLowerCase() === 's') {
             upKeyActive = true;
             e.preventDefault();
             return;
-        } else if (e.key === 'ArrowDown' || e.keyCode === 40) {
+        } else if (e.key.toLowerCase() === 'b') {
             downKeyActive = true;
             e.preventDefault();
             return;
-        } else if (e.key === 'h') {
+        } else if (e.key === 'h' || e.key === 'ArrowLeft') {
             this.props.onSelectionLeft();
-        } else if (e.key === 'l') {
+        } else if (e.key === 'l' || e.key === 'ArrowRight') {
             this.props.onSelectionRight();
-        } else if (e.key === 'j') {
+        } else if (e.key === 'j' || e.key === 'ArrowDown') {
             this.props.onSelectionDown();
-        } else if (e.key === 'k') {
+        } else if (e.key === 'k' || e.key === 'ArrowUp') {
             this.props.onSelectionUp();
         } else if (e.key === 'x') {
-            this.props.onDeleteMeasure(this.props.song.selectedMeasureIndex);
+            let measureIndex = this.props.song.selectedMeasureIndex;
+            let beatIndex = this.props.song.selectedBeatIndex;
+
+            if (beatIndex !== null) {
+                this.props.onDeleteChord(measureIndex, beatIndex);
+            } else {
+                this.props.onDeleteMeasure(measureIndex);
+            }
         }
 
         let degree = keyboardEventToDegree(e);
@@ -79,9 +97,9 @@ const EditableSong = React.createClass({
         }
     },
     handleKeyUp: function (e) {
-        if (e.key === 'ArrowUp' || e.keyCode === 38) {
+        if (e.key.toLowerCase() === 's' || e.keyCode === 38) {
             upKeyActive = false;
-        } else if (e.key === 'ArrowDown' || e.keyCode === 40) {
+        } else if (e.key.toLowerCase() === 'b' || e.keyCode === 40) {
             downKeyActive = false;
         }
     },

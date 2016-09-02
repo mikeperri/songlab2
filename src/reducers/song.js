@@ -3,6 +3,7 @@ import _ from 'lodash';
 const defaultSong = {
     key: 'C',
     measures: [],
+    defaultNumberOfBeats: 4,
     selectedMeasureIndex: 0,
     selectedBeatIndex: null
 };
@@ -11,11 +12,41 @@ const songReducer = (state = defaultSong, action) => {
     if (action.type === 'ADD_CHORD') {
         let newSong = _.clone(state);
 
-        newSong.measures.push({
-            chord: action.chord,
-            numberOfBeats: 4,
-            tracks: []
-        });
+        if (state.selectedMeasureIndex === state.measures.length) {
+            newSong.measures.push({
+                numberOfBeats: state.defaultNumberOfBeats,
+                chordTrack: {
+                    beats: _.range(4).map((index) => {
+                        let beat = {
+                            tuplet: 4,
+                            notes: []
+                        };
+
+                        if (index === 0) {
+                            beat.notes.push({
+                                division: 0,
+                                chord: action.chord
+                            });
+                        }
+
+                        return beat;
+                    })
+                },
+                tracks: []
+            });
+        } else {
+            // revise to allow chords on upbeats
+            let selectedMeasure = state.measures[state.selectedMeasureIndex];
+            let selectedBeat = selectedMeasure.chordTrack.beats[state.selectedBeatIndex || 0];
+
+            if (selectedBeat.notes.length === 0) {
+                selectedBeat.notes.push({ division: 0 });
+            }
+
+            let selectedNote = selectedBeat.notes[0];
+
+            selectedNote.chord = action.chord;
+        }
 
         return newSong;
     } else if (action.type === 'SELECTION_LEFT') {
@@ -104,7 +135,22 @@ const songReducer = (state = defaultSong, action) => {
             newSong.selectedMeasureIndex = newSong.measures.length - 1;
         }
 
+        newSong.selectedBeatIndex = null;
+
         return newSong;
+    } else if (action.type === 'DELETE_CHORD') {
+        let newSong = _.clone(state);
+        let measure = newSong.measures[state.selectedMeasureIndex];
+
+        if (measure && state.selectedBeatIndex !== null) {
+            let beat = measure.chordTrack.beats[state.selectedBeatIndex];
+
+            beat.notes.shift();
+
+            return newSong;
+        } else {
+            return state;
+        }
     } else {
         return state;
     }

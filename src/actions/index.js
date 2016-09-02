@@ -72,3 +72,11 @@ export const deleteMeasure = (measureIndex) => {
         measureIndex
     };
 };
+
+export const deleteChord = (measureIndex, beatIndex) => {
+    return {
+        type: types.DELETE_CHORD,
+        measureIndex,
+        beatIndex
+    }
+}

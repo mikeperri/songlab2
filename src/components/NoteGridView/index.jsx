@@ -1,21 +1,12 @@
 import React from 'react';
 import _ from 'lodash';
-
-// Each track must have the same number of beats
+import { trackPropType } from '../../types/track.js';
 
 export default React.createClass({
     propTypes: {
         numberOfBeats: React.PropTypes.number.isRequired,
         beatWidth: React.PropTypes.number.isRequired,
-        tracks: React.PropTypes.arrayOf(React.PropTypes.shape({
-            beats: React.PropTypes.arrayOf(React.PropTypes.shape({
-                tuplet: React.PropTypes.number,
-                notes: React.PropTypes.arrayOf(React.PropTypes.shape({
-                    division: React.PropTypes.number,
-                    pitch: React.PropTypes.number
-                }))
-            }))
-        })),
+        tracks: React.PropTypes.arrayOf(trackPropType),
         lowerPitchLimit: React.PropTypes.number,
         upperPitchLimit: React.PropTypes.number
     },

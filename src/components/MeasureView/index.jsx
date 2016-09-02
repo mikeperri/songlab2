@@ -1,6 +1,7 @@
 import React from 'react';
 import _ from 'lodash';
 import NoteGridView from '../NoteGridView/';
+import { trackPropType } from '../../types/track.js';
 
 const beatWidth = 50;
 
@@ -9,9 +10,9 @@ export default React.createClass({
         lowerPitchLimit: React.PropTypes.number,
         upperPitchLimit: React.PropTypes.number,
         measure: React.PropTypes.shape({
-            chord: React.PropTypes.string,
             numberOfBeats: React.PropTypes.number.isRequired,
-            tracks: NoteGridView.propTypes.tracks
+            chordTrack: trackPropType,
+            tracks: React.PropTypes.arrayOf(trackPropType)
         }),
         selection: React.PropTypes.shape({
             measure: React.PropTypes.bool,
@@ -44,10 +45,17 @@ export default React.createClass({
             }
         }
 
+        let chordIndex = 0;
+        let chordElements = _.reduce(measure.chordTrack.beats, (acc, beat) => {
+            return acc.concat(beat.notes.map((note) => {
+                return <div className="chord" key={chordIndex++}>{note.chord}</div>;
+            }));
+        }, []);
+
         return (
             <div className="measure">
                 {selectionElement}
-                <h2>{measure.chord}</h2>
+                {chordElements}
                 <NoteGridView
                     beatWidth={beatWidth}
                     numberOfBeats={numberOfBeats}
