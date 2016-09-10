@@ -78,5 +78,17 @@ export const deleteChord = (measureIndex, beatIndex) => {
         type: types.DELETE_CHORD,
         measureIndex,
         beatIndex
-    }
-}
+    };
+};
+
+export const startEditing = () => {
+    return {
+        type: types.START_EDITING
+    };
+};
+
+export const stopEditing = () => {
+    return {
+        type: types.STOP_EDITING
+    };
+};

@@ -5,7 +5,8 @@ const defaultSong = {
     measures: [],
     defaultNumberOfBeats: 4,
     selectedMeasureIndex: 0,
-    selectedBeatIndex: null
+    selectedBeatIndex: null,
+    editing: false
 };
 
 const songReducer = (state = defaultSong, action) => {
@@ -151,6 +152,10 @@ const songReducer = (state = defaultSong, action) => {
         } else {
             return state;
         }
+    } else if (action.type === 'START_EDITING') {
+        return Object.assign(state, { editing: true });
+    } else if (action.type === 'STOP_EDITING') {
+        return Object.assign(state, { editing: false });
     } else {
         return state;
     }

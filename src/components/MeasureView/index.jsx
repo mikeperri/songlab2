@@ -46,9 +46,20 @@ export default React.createClass({
         }
 
         let chordIndex = 0;
-        let chordElements = _.reduce(measure.chordTrack.beats, (acc, beat) => {
+        let chordElements = _.reduce(measure.chordTrack.beats, (acc, beat, beatIndex) => {
             return acc.concat(beat.notes.map((note) => {
-                return <div className="chord" key={chordIndex++}>{note.chord}</div>;
+                let chordStyle = {
+                    top: 10,
+                    left: beatIndex * beatWidth
+                };
+
+                return (
+                    <div className="chord"
+                        style={chordStyle}
+                        key={chordIndex++}>
+                        {note.chord}
+                    </div>
+                );
             }));
         }, []);
 

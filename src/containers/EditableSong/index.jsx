@@ -1,6 +1,8 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import Modal from 'react-modal';
 import _ from 'lodash';
+import Editor from '../Editor/';
 import SongView from '../../components/SongView/';
 import keyboardEventToDegree from '../../utils/keyboardEventToDegree.js';
 import getChordForDegree, { CHORD_MODIFIERS } from '../../utils/getChordForDegree.js';
@@ -11,12 +13,15 @@ import {
     selectionUp,
     selectionDown,
     deleteMeasure,
-    deleteChord
+    deleteChord,
+    startEditing,
+    stopEditing
 } from '../../actions/';
 
 const mapStateToProps = (state) => {
     return {
-        song: state.song
+        song: state.song,
+        editing: state.editing
     };
 };
 
@@ -42,6 +47,12 @@ const mapDispatchToProps = (dispatch) => {
         },
         onDeleteChord: (measureIndex, beatIndex) => {
             dispatch(deleteChord(measureIndex, beatIndex));
+        },
+        onStartEditing: () => {
+            dispatch(startEditing());
+        },
+        onStopEditing: () => {
+            dispatch(stopEditing());
         }
     };
 };
@@ -75,6 +86,12 @@ const EditableSong = React.createClass({
                 this.props.onDeleteChord(measureIndex, beatIndex);
             } else {
                 this.props.onDeleteMeasure(measureIndex);
+            }
+        } else if (e.key === 'Enter' && e.metaKey) {
+            if (this.props.editing) {
+                this.props.onStopEditing();
+            } else {
+                this.props.onStartEditing();
             }
         }
 
@@ -112,7 +129,15 @@ const EditableSong = React.createClass({
         this.props.document.removeEventListener('keyup', this.handleKeyUp);
     },
     render: function () {
-        return <SongView song={this.props.song} />
+            return (
+                <div>
+                    <Modal
+                        isOpen={this.props.song.editing}>
+                        <Editor document={this.props.document} />
+                    </Modal>
+                    <SongView song={this.props.song} />
+                </div>
+            );
     }
 });
 
