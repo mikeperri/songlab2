@@ -119,7 +119,7 @@ let TapInput = React.createClass({
             division,
             error,
             nextBeat,
-            pitch: 'N'
+            pitch: 21
         };
     },
     calculateNormalizedError: function (notes) {
@@ -208,11 +208,13 @@ let TapInput = React.createClass({
 });
 
 const mapStateToProps = (state) => {
+    let noteEditorState = state.editableSong.noteEditor;
+
     return {
-        recording: state.recording,
-        canStartRecording: !state.recording,
-        canStopRecording: state.recording,
-        hasBeats: !!state.beats.present.length
+        recording: noteEditorState.recording,
+        canStartRecording: !noteEditorState.recording,
+        canStopRecording: noteEditorState.recording,
+        hasBeats: !!noteEditorState.beats.present.length
     };
 };
 

@@ -34,7 +34,7 @@ let Editor = React.createClass({
 
 let mapStateToProps = (state) => {
     return {
-        mode: state.mode
+        mode: state.editableSong.noteEditor.mode
     };
 };
 

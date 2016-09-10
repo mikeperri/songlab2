@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import Measure from '../constructors/measure.js';
 
 const defaultSong = {
     key: 'C',
@@ -14,27 +15,10 @@ const songReducer = (state = defaultSong, action) => {
         let newSong = _.clone(state);
 
         if (state.selectedMeasureIndex === state.measures.length) {
-            newSong.measures.push({
+            newSong.measures.push(new Measure({
                 numberOfBeats: state.defaultNumberOfBeats,
-                chordTrack: {
-                    beats: _.range(4).map((index) => {
-                        let beat = {
-                            tuplet: 4,
-                            notes: []
-                        };
-
-                        if (index === 0) {
-                            beat.notes.push({
-                                division: 0,
-                                chord: action.chord
-                            });
-                        }
-
-                        return beat;
-                    })
-                },
-                tracks: []
-            });
+                chord: action.chord
+            }));
         } else {
             // revise to allow chords on upbeats
             let selectedMeasure = state.measures[state.selectedMeasureIndex];
@@ -152,10 +136,6 @@ const songReducer = (state = defaultSong, action) => {
         } else {
             return state;
         }
-    } else if (action.type === 'START_EDITING') {
-        return Object.assign(state, { editing: true });
-    } else if (action.type === 'STOP_EDITING') {
-        return Object.assign(state, { editing: false });
     } else {
         return state;
     }

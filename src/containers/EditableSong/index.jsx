@@ -20,8 +20,8 @@ import {
 
 const mapStateToProps = (state) => {
     return {
-        song: state.song,
-        editing: state.editing
+        song: state.editableSong.song,
+        editing: state.editableSong.editing
     };
 };
 
@@ -129,15 +129,14 @@ const EditableSong = React.createClass({
         this.props.document.removeEventListener('keyup', this.handleKeyUp);
     },
     render: function () {
-            return (
-                <div>
-                    <Modal
-                        isOpen={this.props.song.editing}>
-                        <Editor document={this.props.document} />
-                    </Modal>
-                    <SongView song={this.props.song} />
-                </div>
-            );
+        return (
+            <div>
+                <Modal isOpen={this.props.editing}>
+                    <Editor document={this.props.document} />
+                </Modal>
+                <SongView song={this.props.song} />
+            </div>
+        );
     }
 });
 

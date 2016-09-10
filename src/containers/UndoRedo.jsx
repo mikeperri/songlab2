@@ -15,9 +15,11 @@ let UndoRedo = ({ canUndo, canRedo, onUndo, onRedo }) => (
 );
 
 const mapStateToProps = (state) => {
+    let noteEditorState = state.editableSong.noteEditor;
+
     return {
-        canUndo: state.beats.past.length > 0,
-        canRedo: state.beats.future.length > 0
+        canUndo: noteEditorState.beats.past.length > 0,
+        canRedo: noteEditorState.beats.future.length > 0
     };
 };
 

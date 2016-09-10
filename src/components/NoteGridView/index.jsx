@@ -25,11 +25,13 @@ export default React.createClass({
 
         tracks.forEach((track, trackIndex) => {
             track.beats.forEach((beat, beatIndex) => {
+                let divisions = beat.tuplet === 1 ? 4 : beat.tuplet;
+
                 beat.notes.forEach((note, noteIndex) => {
                     let noteStyle = {
                         position: 'absolute',
                         bottom: ((note.pitch - lowerPitchLimit) / (upperPitchLimit - lowerPitchLimit)) * height,
-                        left: (beatIndex * beatWidth) + ((note.division/beat.tuplet) * beatWidth)
+                        left: (beatIndex * beatWidth) + ((note.division/divisions) * beatWidth)
                     };
 
                     notes.push(
