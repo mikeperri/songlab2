@@ -1,12 +1,12 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import Modal from 'react-modal';
 import _ from 'lodash';
-import Editor from '../Editor/';
+import TapInput from '../TapInput/';
 import SongView from '../../components/SongView/';
 import keyboardEventToDegree from '../../utils/keyboardEventToDegree.js';
 import getChordForDegree, { CHORD_MODIFIERS } from '../../utils/getChordForDegree.js';
 import {
+    setBeats,
     addChord,
     selectionLeft,
     selectionRight,
@@ -14,14 +14,13 @@ import {
     selectionDown,
     deleteMeasure,
     deleteChord,
-    startEditing,
-    stopEditing
+    setRecording
 } from '../../actions/';
 
 const mapStateToProps = (state) => {
     return {
         song: state.editableSong.song,
-        editing: state.editableSong.editing
+        recording: state.editableSong.noteEditor.recording
     };
 };
 
@@ -48,11 +47,12 @@ const mapDispatchToProps = (dispatch) => {
         onDeleteChord: (measureIndex, beatIndex) => {
             dispatch(deleteChord(measureIndex, beatIndex));
         },
-        onStartEditing: () => {
-            dispatch(startEditing());
+        onStartRecording: () => {
+            dispatch(setBeats([]));
+            dispatch(setRecording(true));
         },
-        onStopEditing: () => {
-            dispatch(stopEditing());
+        onStopRecording: () => {
+            dispatch(setRecording(false));
         }
     };
 };
@@ -87,12 +87,14 @@ const EditableSong = React.createClass({
             } else {
                 this.props.onDeleteMeasure(measureIndex);
             }
-        } else if (e.key === 'Enter' && e.metaKey) {
-            if (this.props.editing) {
-                this.props.onStopEditing();
+        } else if (e.key === 'r') {
+            if (this.props.recording) {
+                this.props.onStopRecording();
             } else {
-                this.props.onStartEditing();
+                this.props.onStartRecording();
             }
+        } else if (e.key === 'Escape') {
+            this.props.onStopRecording();
         }
 
         let degree = keyboardEventToDegree(e);
@@ -131,9 +133,7 @@ const EditableSong = React.createClass({
     render: function () {
         return (
             <div>
-                <Modal isOpen={this.props.editing}>
-                    <Editor document={this.props.document} />
-                </Modal>
+                <TapInput document={this.props.document} />
                 <SongView song={this.props.song} />
             </div>
         );

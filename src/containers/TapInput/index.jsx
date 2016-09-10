@@ -1,10 +1,10 @@
 import React from 'react';
 import _ from 'lodash';
 import { connect } from 'react-redux';
-import { setBeats, appendBeats, setRecording } from '../../actions';
+import { appendBeats } from '../../actions/';
 
-import RhythmGridView from '../../components/RhythmGridView';
-import Beat from './Beat';
+import RhythmGridView from '../../components/RhythmGridView/';
+import Beat from '../../constructors/beat.js';
 
 const PX_PER_BEAT = 100;
 
@@ -21,7 +21,6 @@ let TapInput = React.createClass({
         let beats = _.times(this.measures * beatsPerMeasure, () => new Beat({}));
 
         return {
-            recording: false,
             beatDivisions,
             beatsPerMeasure,
             beats: [],
@@ -180,55 +179,36 @@ let TapInput = React.createClass({
         }
         return sum / (taps.length - 1);
     },
-    startRecording: function () {
-        if (this.props.hasBeats) {
-            this.props.onClearBeats();
-        }
-
-        this.props.onStartRecording();
-    },
-    stopRecording: function () {
-        this.initializeTapsAndNotes();
-        this.props.onStopRecording();
-    },
     componentDidMount: function () {
         this.props.document.addEventListener('keydown', this.handleKeyDown);
     },
     componentWillUnmount: function () {
         this.props.document.removeEventListener('keydown', this.handleKeyDown);
     },
+    componentWillReceiveProps: function (nextProps) {
+        if (this.props.recording === false && nextProps.recording === true) {
+            this.initializeTapsAndNotes();
+        }
+    },
     render: function () {
         return (
             <div className="tap-input">
-                <button onClick={this.startRecording} disabled={!this.props.canStartRecording}>Start</button>
-                <button onClick={this.stopRecording} disabled={!this.props.canStopRecording}>Stop</button>
             </div>
         );
     }
 });
 
 const mapStateToProps = (state) => {
+    let songState = state.editableSong.song;
     let noteEditorState = state.editableSong.noteEditor;
 
     return {
-        recording: noteEditorState.recording,
-        canStartRecording: !noteEditorState.recording,
-        canStopRecording: noteEditorState.recording,
-        hasBeats: !!noteEditorState.beats.present.length
+        recording: songState.recording
     };
 };
 
 const mapDispatchToProps = (dispatch) => {
     return {
-        onStartRecording: () => {
-            dispatch(setRecording(true));
-        },
-        onStopRecording: () => {
-            dispatch(setRecording(false));
-        },
-        onClearBeats: (beat) => {
-            dispatch(setBeats([]));
-        },
         onAppendBeat: (beat) => {
             dispatch(appendBeats([beat]));
         }

@@ -1,17 +1,56 @@
 import _ from 'lodash';
 import Measure from '../constructors/measure.js';
+import Track from '../constructors/track.js';
 
 const defaultSong = {
     key: 'C',
     measures: [],
     defaultNumberOfBeats: 4,
     selectedMeasureIndex: 0,
+    selectedTrackIndex: 0,
     selectedBeatIndex: null,
-    editing: false
+    recording: false
 };
 
 const songReducer = (state = defaultSong, action) => {
-    if (action.type === 'ADD_CHORD') {
+    function createTrack(measure) {
+        let newTrack = new Track({});
+        measure.tracks[state.selectedTrackIndex] = newTrack;
+
+        return newTrack;
+    }
+
+    function createMeasure(song) {
+        let newMeasure = new Measure({ numberOfBeats: state.defaultNumberOfBeats });
+        song.measures.push(newMeasure);
+
+        return newMeasure;
+    }
+
+    if (action.type === 'SET_RECORDING') {
+        return Object.assign({}, state, { recording: action.recording });
+    } else if (action.type === 'SET_BEATS') {
+        let newSong = _.clone(state);
+        let selectedMeasure = newSong.measures[state.selectedMeasureIndex] || createMeasure(newSong);
+        let selectedTrack = selectedMeasure.tracks[state.selectedTrackIndex] || createTrack(selectedMeasure);
+
+        selectedTrack.beats = action.beats;
+
+        return newSong;
+    } else if (action.type === 'APPEND_BEATS') {
+        let newSong = _.clone(state);
+        let selectedMeasure, selectedTrack;
+
+        do {
+            selectedMeasure = newSong.measures[newSong.selectedMeasureIndex] || createMeasure(newSong);
+            selectedTrack = selectedMeasure.tracks[state.selectedTrackIndex] || createTrack(selectedMeasure);
+        } while (selectedTrack.beats.length === selectedMeasure.numberOfBeats &&
+                (newSong.selectedMeasureIndex++, true));
+
+        selectedTrack.beats = selectedTrack.beats.concat(action.beats);
+
+        return newSong;
+    } else if (action.type === 'ADD_CHORD' && !state.recording) {
         let newSong = _.clone(state);
 
         if (state.selectedMeasureIndex === state.measures.length) {
@@ -34,7 +73,7 @@ const songReducer = (state = defaultSong, action) => {
         }
 
         return newSong;
-    } else if (action.type === 'SELECTION_LEFT') {
+    } else if (action.type === 'SELECTION_LEFT' && !state.recording) {
         let newSong = _.clone(state);
         let selectedMeasure = newSong.measures[state.selectedMeasureIndex];
 
@@ -62,7 +101,7 @@ const songReducer = (state = defaultSong, action) => {
         }
 
         return newSong;
-    } else if (action.type === 'SELECTION_RIGHT') {
+    } else if (action.type === 'SELECTION_RIGHT' && !state.recording) {
         let newSong = _.clone(state);
         let selectedMeasure = newSong.measures[state.selectedMeasureIndex];
 
@@ -89,7 +128,7 @@ const songReducer = (state = defaultSong, action) => {
         }
 
         return newSong;
-    } else if (action.type === 'SELECTION_UP') {
+    } else if (action.type === 'SELECTION_UP' && !state.recording) {
         if (state.selectedBeatIndex !== null) {
             let newSong = _.clone(state);
 
@@ -99,7 +138,7 @@ const songReducer = (state = defaultSong, action) => {
         } else {
             return state;
         }
-    } else if (action.type === 'SELECTION_DOWN') {
+    } else if (action.type === 'SELECTION_DOWN' && !state.recording) {
         if (state.selectedBeatIndex === null) {
             let newSong = _.clone(state);
 
@@ -109,7 +148,7 @@ const songReducer = (state = defaultSong, action) => {
         } else {
             return state;
         }
-    } else if (action.type === 'DELETE_MEASURE') {
+    } else if (action.type === 'DELETE_MEASURE' && !state.recording) {
         let newSong = _.clone(state);
 
         newSong.measures = state.measures.filter((measure, index) => index !== action.measureIndex);
@@ -123,7 +162,7 @@ const songReducer = (state = defaultSong, action) => {
         newSong.selectedBeatIndex = null;
 
         return newSong;
-    } else if (action.type === 'DELETE_CHORD') {
+    } else if (action.type === 'DELETE_CHORD' && !state.recording) {
         let newSong = _.clone(state);
         let measure = newSong.measures[state.selectedMeasureIndex];
 
