@@ -35,6 +35,13 @@ export const setMode = (mode) => {
     };
 };
 
+export const insertMeasure = (measureIndex) => {
+    return {
+        type: types.INSERT_MEASURE,
+        measureIndex
+    }
+};
+
 export const addChord = (chord) => {
     return {
         type: types.ADD_CHORD,

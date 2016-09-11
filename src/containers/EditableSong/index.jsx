@@ -9,6 +9,7 @@ import getChordForDegree, { CHORD_MODIFIERS } from '../../utils/getChordForDegre
 import { INPUT_MODES } from '../../constants.js';
 import {
     setBeats,
+    insertMeasure,
     addChord,
     selectionLeft,
     selectionRight,
@@ -28,6 +29,9 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
     return {
+        onInsertMeasure: (measureIndex) => {
+            dispatch(insertMeasure(measureIndex));
+        },
         onAddChord: (chord) => {
             dispatch(addChord(chord));
         },
@@ -80,6 +84,10 @@ const EditableSong = React.createClass({
             this.props.onSelectionDown();
         } else if (e.key === 'k' || e.key === 'ArrowUp') {
             this.props.onSelectionUp();
+        } else if (e.key === 'i') {
+            let measureIndex = this.props.song.selectedMeasureIndex;
+
+            this.props.onInsertMeasure(measureIndex);
         } else if (e.key === 'x') {
             let measureIndex = this.props.song.selectedMeasureIndex;
             let beatIndex = this.props.song.selectedBeatIndex;

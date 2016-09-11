@@ -21,9 +21,14 @@ const songReducer = (state = defaultSong, action) => {
         return newTrack;
     }
 
-    function createMeasure(song) {
+    function createMeasure(song, measureIndex) {
         let newMeasure = new Measure({ numberOfBeats: state.defaultNumberOfBeats });
-        song.measures.push(newMeasure);
+
+        if (_.isUndefined(measureIndex)) {
+            song.measures.push(newMeasure);
+        } else {
+            song.measures.splice(measureIndex, 0, newMeasure);
+        }
 
         return newMeasure;
     }
@@ -53,6 +58,12 @@ const songReducer = (state = defaultSong, action) => {
         }
 
         selectedTrack.beats = selectedTrack.beats.concat(action.beats);
+
+        return newSong;
+    } else if (action.type === 'INSERT_MEASURE' && state.inputMode === INPUT_MODES.NORMAL) {
+        let newSong = _.clone(state);
+
+        createMeasure(newSong, action.measureIndex);
 
         return newSong;
     } else if (action.type === 'ADD_CHORD' && state.inputMode === INPUT_MODES.NORMAL) {
