@@ -4,27 +4,24 @@ import MeasureView from '../MeasureView/';
 
 export default React.createClass({
     propTypes: {
-        song: React.PropTypes.shape({
-            key: React.PropTypes.string,
-            measures: React.PropTypes.arrayOf(React.PropTypes.shape({
-                measure: MeasureView.propTypes.measure
-            })),
-            selectedMeasureIndex: React.PropTypes.number,
-            selectedBeatIndex: React.PropTypes.number,
-        })
+        keySignature: React.PropTypes.string,
+        measures: React.PropTypes.arrayOf(React.PropTypes.shape({
+            measure: MeasureView.propTypes.measure
+        })),
+        selectedMeasureIndex: React.PropTypes.number,
+        selectedBeatIndex: React.PropTypes.number,
     },
     render: function () {
-        let song = this.props.song;
         let lowerPitchLimit = 21;
         let upperPitchLimit = 33;
 
-        let measureElements = song.measures.map((measure, index) => {
+        let measureElements = this.props.measures.map((measure, index) => {
             let selection;
 
-            if (index === song.selectedMeasureIndex) {
+            if (index === this.props.selectedMeasureIndex) {
                 selection = {
-                    measure: (song.selectedBeatIndex === null),
-                    beatIndex: song.selectedBeatIndex
+                    measure: (this.props.selectedBeatIndex === null),
+                    beatIndex: this.props.selectedBeatIndex
                 };
             }
 
@@ -37,10 +34,10 @@ export default React.createClass({
 
         let placeholderSelection = null;
 
-        if (song.selectedMeasureIndex === song.measures.length) {
+        if (this.props.selectedMeasureIndex >= this.props.measures.length) {
             let selectionStyle = {};
 
-            if (song.selectedBeatIndex !== null) {
+            if (this.props.selectedBeatIndex !== null) {
                 selectionStyle.top = 5;
             }
 

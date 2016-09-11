@@ -2,6 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import _ from 'lodash';
 import TapInput from '../TapInput/';
+import UndoRedo from '../UndoRedo.jsx';
 import SongView from '../../components/SongView/';
 import InputModeView from '../../components/InputModeView/';
 import keyboardEventToDegree from '../../utils/keyboardEventToDegree.js';
@@ -67,6 +68,9 @@ let upKeyActive = false;
 let downKeyActive = false;
 
 const EditableSong = React.createClass({
+    getSong: function () {
+        return this.props.song.present;
+    },
     handleKeyDown: function (e) {
         if (e.key.toLowerCase() === 's') {
             upKeyActive = true;
@@ -85,12 +89,12 @@ const EditableSong = React.createClass({
         } else if (e.key === 'k' || e.key === 'ArrowUp') {
             this.props.onSelectionUp();
         } else if (e.key === 'i') {
-            let measureIndex = this.props.song.selectedMeasureIndex;
+            let measureIndex = this.getSong().selectedMeasureIndex;
 
             this.props.onInsertMeasure(measureIndex);
         } else if (e.key === 'x') {
-            let measureIndex = this.props.song.selectedMeasureIndex;
-            let beatIndex = this.props.song.selectedBeatIndex;
+            let measureIndex = this.getSong().selectedMeasureIndex;
+            let beatIndex = this.getSong().selectedBeatIndex;
 
             if (beatIndex !== null) {
                 this.props.onDeleteChord(measureIndex, beatIndex);
@@ -120,7 +124,7 @@ const EditableSong = React.createClass({
                 chordModifiers.push(CHORD_MODIFIERS.FLAT);
             }
 
-            let chord = getChordForDegree(this.props.song.key, degree, chordModifiers);
+            let chord = getChordForDegree(this.getSong().key, degree, chordModifiers);
 
             this.props.onAddChord(chord);
         }
@@ -142,16 +146,23 @@ const EditableSong = React.createClass({
     },
     render: function () {
         let tapInput;
+        let song = this.getSong();
 
-        if (this.props.song.inputMode === INPUT_MODES.RHYTHM) {
+        if (song.inputMode === INPUT_MODES.RHYTHM) {
             tapInput = <TapInput document={this.props.document} />;
         }
 
         return (
             <div>
-                <InputModeView inputMode={this.props.song.inputMode} />
+                <InputModeView inputMode={song.inputMode} />
+                <UndoRedo />
                 {tapInput}
-                <SongView song={this.props.song} />
+                <SongView
+                    keySignature={song.key}
+                    measures={song.measures}
+                    selectedMeasureIndex={song.selectedMeasureIndex}
+                    selectedBeatIndex={song.selectedBeatIndex}
+                    />
             </div>
         );
     }

@@ -200,8 +200,7 @@ let TapInput = React.createClass({
 });
 
 const mapStateToProps = (state) => {
-    let songState = state.editableSong.song;
-    let noteEditorState = state.editableSong.noteEditor;
+    let songState = state.editableSong.song.present;
 
     return {
         recording: songState.inputMode === INPUT_MODES.RHYTHM

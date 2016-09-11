@@ -1,5 +1,4 @@
 import React from 'react';
-import { setRecording } from '../actions';
 import { ActionCreators as UndoActionCreators } from 'redux-undo';
 import { connect } from 'react-redux';
 
@@ -15,23 +14,21 @@ let UndoRedo = ({ canUndo, canRedo, onUndo, onRedo }) => (
 );
 
 const mapStateToProps = (state) => {
-    let noteEditorState = state.editableSong.noteEditor;
+    let songState = state.editableSong.song;
 
     return {
-        canUndo: noteEditorState.beats.past.length > 0,
-        canRedo: noteEditorState.beats.future.length > 0
+        canUndo: songState.past.length > 0,
+        canRedo: songState.future.length > 0
     };
 };
 
 const mapDispatchToProps = (dispatch) => {
     return {
         onUndo: () => {
-            dispatch(setRecording(false));
-            dispatch(UndoActionCreators.undo());
+            dispatch({ type: 'UNDO' });
         },
         onRedo: () => {
-            dispatch(setRecording(false));
-            dispatch(UndoActionCreators.redo());
+            dispatch({ type: 'REDO' });
         }
     };
 };
