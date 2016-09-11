@@ -5,6 +5,7 @@ import { appendBeats } from '../../actions/';
 
 import RhythmGridView from '../../components/RhythmGridView/';
 import Beat from '../../constructors/beat.js';
+import { INPUT_MODES } from '../../constants.js';
 
 const PX_PER_BEAT = 100;
 
@@ -203,7 +204,7 @@ const mapStateToProps = (state) => {
     let noteEditorState = state.editableSong.noteEditor;
 
     return {
-        recording: songState.recording
+        recording: songState.inputMode === INPUT_MODES.RHYTHM
     };
 };
 

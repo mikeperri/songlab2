@@ -1,0 +1,9 @@
+.input-mode-view div {
+    display: inline-block;
+    border: 1px solid #f0f0f0;
+    padding: 6px;
+}
+
+.input-mode-view div.selected {
+    background: rgba(55, 54, 145, 0.75);
+}

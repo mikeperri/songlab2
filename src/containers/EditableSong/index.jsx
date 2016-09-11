@@ -3,8 +3,10 @@ import { connect } from 'react-redux';
 import _ from 'lodash';
 import TapInput from '../TapInput/';
 import SongView from '../../components/SongView/';
+import InputModeView from '../../components/InputModeView/';
 import keyboardEventToDegree from '../../utils/keyboardEventToDegree.js';
 import getChordForDegree, { CHORD_MODIFIERS } from '../../utils/getChordForDegree.js';
+import { INPUT_MODES } from '../../constants.js';
 import {
     setBeats,
     addChord,
@@ -14,7 +16,7 @@ import {
     selectionDown,
     deleteMeasure,
     deleteChord,
-    setRecording
+    setInputMode
 } from '../../actions/';
 
 const mapStateToProps = (state) => {
@@ -49,10 +51,10 @@ const mapDispatchToProps = (dispatch) => {
         },
         onStartRecording: () => {
             dispatch(setBeats([]));
-            dispatch(setRecording(true));
+            dispatch(setInputMode(INPUT_MODES.RHYTHM));
         },
         onStopRecording: () => {
-            dispatch(setRecording(false));
+            dispatch(setInputMode(INPUT_MODES.NORMAL));
         }
     };
 };
@@ -131,9 +133,16 @@ const EditableSong = React.createClass({
         this.props.document.removeEventListener('keyup', this.handleKeyUp);
     },
     render: function () {
+        let tapInput;
+
+        if (this.props.song.inputMode === INPUT_MODES.RHYTHM) {
+            tapInput = <TapInput document={this.props.document} />;
+        }
+
         return (
             <div>
-                <TapInput document={this.props.document} />
+                <InputModeView inputMode={this.props.song.inputMode} />
+                {tapInput}
                 <SongView song={this.props.song} />
             </div>
         );

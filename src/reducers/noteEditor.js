@@ -2,15 +2,6 @@ import { combineReducers } from 'redux';
 import undoable, { distinctState } from 'redux-undo';
 import { MODES } from '../containers/Editor/constants';
 
-const recordingReducer = (state = false, action) => {
-    switch (action.type) {
-        case 'SET_RECORDING':
-            return action.recording;
-        default:
-            return state;
-    }
-};
-
 const beatsReducer = (state = [], action) => {
     switch (action.type) {
         case 'SET_BEATS':
@@ -45,7 +36,6 @@ const modeReducer = (state = MODES.RHYTHM, action) => {
 };
 
 const reducers = combineReducers({
-    recording: recordingReducer,
     beats: undoableBeatsReducer,
     pitch: combineReducers({
         offset: offsetReducer

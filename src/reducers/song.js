@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import Measure from '../constructors/measure.js';
 import Track from '../constructors/track.js';
+import { INPUT_MODES } from '../constants.js';
 
 const defaultSong = {
     key: 'C',
@@ -9,7 +10,7 @@ const defaultSong = {
     selectedMeasureIndex: 0,
     selectedTrackIndex: 0,
     selectedBeatIndex: null,
-    recording: false
+    inputMode: INPUT_MODES.NORMAL
 };
 
 const songReducer = (state = defaultSong, action) => {
@@ -27,8 +28,8 @@ const songReducer = (state = defaultSong, action) => {
         return newMeasure;
     }
 
-    if (action.type === 'SET_RECORDING') {
-        return Object.assign({}, state, { recording: action.recording });
+    if (action.type === 'SET_INPUT_MODE') {
+        return Object.assign({}, state, { inputMode: action.inputMode });
     } else if (action.type === 'SET_BEATS') {
         let newSong = _.clone(state);
         let selectedMeasure = newSong.measures[state.selectedMeasureIndex] || createMeasure(newSong);
@@ -41,16 +42,20 @@ const songReducer = (state = defaultSong, action) => {
         let newSong = _.clone(state);
         let selectedMeasure, selectedTrack;
 
-        do {
+        selectedMeasure = newSong.measures[newSong.selectedMeasureIndex] || createMeasure(newSong);
+        selectedTrack = selectedMeasure.tracks[state.selectedTrackIndex] || createTrack(selectedMeasure);
+
+        while (selectedTrack.beats.length === selectedMeasure.numberOfBeats) {
+            newSong.selectedMeasureIndex++;
             selectedMeasure = newSong.measures[newSong.selectedMeasureIndex] || createMeasure(newSong);
             selectedTrack = selectedMeasure.tracks[state.selectedTrackIndex] || createTrack(selectedMeasure);
-        } while (selectedTrack.beats.length === selectedMeasure.numberOfBeats &&
-                (newSong.selectedMeasureIndex++, true));
+            selectedTrack.beats = [];
+        }
 
         selectedTrack.beats = selectedTrack.beats.concat(action.beats);
 
         return newSong;
-    } else if (action.type === 'ADD_CHORD' && !state.recording) {
+    } else if (action.type === 'ADD_CHORD' && state.inputMode === INPUT_MODES.NORMAL) {
         let newSong = _.clone(state);
 
         if (state.selectedMeasureIndex === state.measures.length) {
@@ -73,7 +78,7 @@ const songReducer = (state = defaultSong, action) => {
         }
 
         return newSong;
-    } else if (action.type === 'SELECTION_LEFT' && !state.recording) {
+    } else if (action.type === 'SELECTION_LEFT' && state.inputMode === INPUT_MODES.NORMAL) {
         let newSong = _.clone(state);
         let selectedMeasure = newSong.measures[state.selectedMeasureIndex];
 
@@ -101,7 +106,7 @@ const songReducer = (state = defaultSong, action) => {
         }
 
         return newSong;
-    } else if (action.type === 'SELECTION_RIGHT' && !state.recording) {
+    } else if (action.type === 'SELECTION_RIGHT' && state.inputMode === INPUT_MODES.NORMAL) {
         let newSong = _.clone(state);
         let selectedMeasure = newSong.measures[state.selectedMeasureIndex];
 
@@ -128,7 +133,7 @@ const songReducer = (state = defaultSong, action) => {
         }
 
         return newSong;
-    } else if (action.type === 'SELECTION_UP' && !state.recording) {
+    } else if (action.type === 'SELECTION_UP' && state.inputMode === INPUT_MODES.NORMAL) {
         if (state.selectedBeatIndex !== null) {
             let newSong = _.clone(state);
 
@@ -138,7 +143,7 @@ const songReducer = (state = defaultSong, action) => {
         } else {
             return state;
         }
-    } else if (action.type === 'SELECTION_DOWN' && !state.recording) {
+    } else if (action.type === 'SELECTION_DOWN' && state.inputMode === INPUT_MODES.NORMAL) {
         if (state.selectedBeatIndex === null) {
             let newSong = _.clone(state);
 
@@ -148,7 +153,7 @@ const songReducer = (state = defaultSong, action) => {
         } else {
             return state;
         }
-    } else if (action.type === 'DELETE_MEASURE' && !state.recording) {
+    } else if (action.type === 'DELETE_MEASURE' && state.inputMode === INPUT_MODES.NORMAL) {
         let newSong = _.clone(state);
 
         newSong.measures = state.measures.filter((measure, index) => index !== action.measureIndex);
@@ -162,7 +167,7 @@ const songReducer = (state = defaultSong, action) => {
         newSong.selectedBeatIndex = null;
 
         return newSong;
-    } else if (action.type === 'DELETE_CHORD' && !state.recording) {
+    } else if (action.type === 'DELETE_CHORD' && state.inputMode === INPUT_MODES.NORMAL) {
         let newSong = _.clone(state);
         let measure = newSong.measures[state.selectedMeasureIndex];
 

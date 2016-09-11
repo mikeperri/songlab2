@@ -1,9 +1,9 @@
 import types from './types';
 
-export const setRecording = (recording) => {
+export const setInputMode = (inputMode) => {
     return {
-        type: types.SET_RECORDING,
-        recording
+        type: types.SET_INPUT_MODE,
+        inputMode
     };
 };
 
