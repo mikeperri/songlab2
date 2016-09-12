@@ -100,10 +100,12 @@ const songReducer = (state = defaultSong, action) => {
         let selectedMeasure = newSong.measures[state.selectedMeasureIndex];
 
         function tryToDecrementMeasure() {
-            if (state.selectedMeasureIndex >= state.measures.length) {
-                newSong.selectedMeasureIndex = state.measures.length - 1;
-            } else if (state.selectedMeasureIndex > 0) {
-                newSong.selectedMeasureIndex--;
+            if (state.selectedMeasureIndex > 0) {
+                if (state.selectedMeasureIndex >= state.measures.length) {
+                    newSong.selectedMeasureIndex = state.measures.length - 1;
+                } else {
+                    newSong.selectedMeasureIndex--;
+                }
                 return true;
             } else {
                 return false;
