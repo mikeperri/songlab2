@@ -1,7 +1,7 @@
 import React from 'react';
 import _ from 'lodash';
 import { connect } from 'react-redux';
-import { appendBeats } from '../../actions/';
+import { setBeats } from '../../actions/';
 
 import RhythmGridView from '../../components/RhythmGridView/';
 import Beat from '../../constructors/beat.js';
@@ -82,7 +82,7 @@ let TapInput = React.createClass({
             beat.notes = beat.notes.concat(this.nextBeatNotes);
             this.nextBeatNotes = beat.nextBeatNotes;
 
-            this.props.onAppendBeat(beat);
+            this.props.onSetBeats([beat]);
             this.pendingNoteTimes = [];
         }
     },
@@ -209,8 +209,8 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
     return {
-        onAppendBeat: (beat) => {
-            dispatch(appendBeats([beat]));
+        onSetBeats: (beats) => {
+            dispatch(setBeats(beats));
         }
     };
 };

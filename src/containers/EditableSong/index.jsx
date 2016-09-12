@@ -9,7 +9,6 @@ import keyboardEventToDegree from '../../utils/keyboardEventToDegree.js';
 import getChordForDegree, { CHORD_MODIFIERS } from '../../utils/getChordForDegree.js';
 import { INPUT_MODES } from '../../constants.js';
 import {
-    setBeats,
     insertMeasure,
     addChord,
     selectionLeft,
@@ -55,7 +54,6 @@ const mapDispatchToProps = (dispatch) => {
             dispatch(deleteChord(measureIndex, beatIndex));
         },
         onStartRecording: () => {
-            dispatch(setBeats([]));
             dispatch(setInputMode(INPUT_MODES.RHYTHM));
         },
         onStopRecording: () => {

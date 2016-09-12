@@ -45,32 +45,27 @@ const songReducer = (state = defaultSong, action) => {
         let nextMeasures = _.clone(state.measures);
         let nextSelectedMeasure = cloneOrCreateMeasure(nextMeasures, state.selectedMeasureIndex);
         let selectedTrack = nextSelectedMeasure.tracks[state.selectedTrackIndex] || createTrack(nextSelectedMeasure);
+        let selectedBeatIndex = state.selectedBeatIndex || 0;
 
-        selectedTrack.beats = action.beats;
+        selectedTrack.beats.splice(selectedBeatIndex, action.beats.length, ...action.beats);
 
         nextMeasures[state.selectedMeasureIndex] = nextSelectedMeasure;
 
-        return Object.assign({}, state, { measures: nextMeasures });;
-    } else if (action.type === 'APPEND_BEATS') {
-        let nextMeasures = _.clone(state.measures);
-        let nextSelectedMeasureIndex = state.selectedMeasureIndex;
-        let nextSelectedMeasure, selectedTrack;
-        let nextMeasure;
+        let nextSelectedMeasureIndex, nextSelectedBeatIndex;
 
-        nextSelectedMeasure = cloneOrCreateMeasure(nextMeasures, nextSelectedMeasureIndex);
-        selectedTrack = nextSelectedMeasure.tracks[state.selectedTrackIndex] || createTrack(nextSelectedMeasure);
-
-        while (selectedTrack.beats.length === nextSelectedMeasure.numberOfBeats) {
-            nextSelectedMeasureIndex++;
-            nextSelectedMeasure = cloneOrCreateMeasure(nextMeasures, nextSelectedMeasureIndex);
-            selectedTrack = nextSelectedMeasure.tracks[state.selectedTrackIndex] || createTrack(nextSelectedMeasure);
-            selectedTrack.beats = [];
+        if (selectedBeatIndex === nextSelectedMeasure.numberOfBeats - 1) {
+            nextSelectedMeasureIndex = state.selectedMeasureIndex + 1;
+            nextSelectedBeatIndex = 0;
+        } else {
+            nextSelectedMeasureIndex = state.selectedMeasureIndex;
+            nextSelectedBeatIndex = selectedBeatIndex + 1;
         }
 
-        selectedTrack.beats = selectedTrack.beats.concat(action.beats);
-        nextMeasures[nextSelectedMeasureIndex] = nextSelectedMeasure;
-
-        return Object.assign({}, state, { measures: nextMeasures, selectedMeasureIndex: nextSelectedMeasureIndex });
+        return Object.assign({}, state, {
+            measures: nextMeasures,
+            selectedMeasureIndex: nextSelectedMeasureIndex,
+            selectedBeatIndex: nextSelectedBeatIndex
+        });
     } else if (action.type === 'INSERT_MEASURE' && state.inputMode === INPUT_MODES.NORMAL) {
         let newSong = _.clone(state);
 
