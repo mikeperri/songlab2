@@ -1,5 +1,4 @@
 import React from 'react';
-import Editor from '../../containers/Editor/';
 import MeasureView from '../MeasureView/';
 
 export default React.createClass({

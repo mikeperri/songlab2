@@ -1,16 +1,22 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import _ from 'lodash';
-import TapInput from '../TapInput/';
+
+// Components
+import TapInput from '../../components/TapInput/';
 import PitchInput from '../../components/PitchInput/';
-import UndoRedo from '../UndoRedo.jsx';
 import SongView from '../../components/SongView/';
 import InputModeView from '../../components/InputModeView/';
+
+// Containers
+import UndoRedo from '../UndoRedo.jsx';
+
 import keyboardEventToDegree from '../../utils/keyboardEventToDegree.js';
 import getChordForDegree, { CHORD_MODIFIERS } from '../../utils/getChordForDegree.js';
 import { INPUT_MODES } from '../../constants.js';
 import {
     insertMeasure,
+    setBeats,
     setPitch,
     addChord,
     selectionLeft,
@@ -24,8 +30,7 @@ import {
 
 const mapStateToProps = (state) => {
     return {
-        song: state.editableSong.song,
-        recording: state.editableSong.noteEditor.recording
+        song: state.song.present
     };
 };
 
@@ -33,6 +38,9 @@ const mapDispatchToProps = (dispatch) => {
     return {
         onInsertMeasure: (measureIndex) => {
             dispatch(insertMeasure(measureIndex));
+        },
+        onSetBeats: (beats) => {
+            dispatch(setBeats(beats));
         },
         onSetPitch: (pitch) => {
             dispatch(setPitch(pitch));
@@ -68,18 +76,17 @@ let upKeyActive = false;
 let downKeyActive = false;
 
 const EditableSong = React.createClass({
-    getSong: function () {
-        return this.props.song.present;
-    },
     handleKeyDown: function (e) {
+        if (e.key === 'Escape') {
+            this.props.onSetMode(INPUT_MODES.NORMAL);
+        } else if (this.props.song.inputMode !== INPUT_MODES.NORMAL) {
+            return;
+        }
+
         if (e.key.toLowerCase() === 's') {
             upKeyActive = true;
-            e.preventDefault();
-            return;
         } else if (e.key.toLowerCase() === 'b') {
             downKeyActive = true;
-            e.preventDefault();
-            return;
         } else if (e.key === 'h' || e.key === 'ArrowLeft') {
             this.props.onSelectionLeft();
         } else if (e.key === 'l' || e.key === 'ArrowRight') {
@@ -89,12 +96,12 @@ const EditableSong = React.createClass({
         } else if (e.key === 'k' || e.key === 'ArrowUp') {
             this.props.onSelectionUp();
         } else if (e.key === 'i') {
-            let measureIndex = this.getSong().selectedMeasureIndex;
+            let measureIndex = this.props.song.selectedMeasureIndex;
 
             this.props.onInsertMeasure(measureIndex);
         } else if (e.key === 'x') {
-            let measureIndex = this.getSong().selectedMeasureIndex;
-            let beatIndex = this.getSong().selectedBeatIndex;
+            let measureIndex = this.props.song.selectedMeasureIndex;
+            let beatIndex = this.props.song.selectedBeatIndex;
 
             if (beatIndex !== null) {
                 this.props.onDeleteChord(measureIndex, beatIndex);
@@ -105,26 +112,24 @@ const EditableSong = React.createClass({
             this.props.onSetMode(INPUT_MODES.RHYTHM);
         } else if (e.key === 'p') {
             this.props.onSetMode(INPUT_MODES.PITCH);
-        } else if (e.key === 'Escape') {
-            this.props.onSetMode(INPUT_MODES.NORMAL);
-        }
+        } else {
+            let degree = keyboardEventToDegree(e);
 
-        let degree = keyboardEventToDegree(e);
+            if (degree) {
+                let chordModifiers = [];
+                if (e.shiftKey) {
+                    chordModifiers.push(CHORD_MODIFIERS.SWITCH_MAJOR_MINOR);
+                }
+                if (upKeyActive) {
+                    chordModifiers.push(CHORD_MODIFIERS.SHARP);
+                } else if (downKeyActive) {
+                    chordModifiers.push(CHORD_MODIFIERS.FLAT);
+                }
 
-        if (degree) {
-            let chordModifiers = [];
-            if (e.shiftKey) {
-                chordModifiers.push(CHORD_MODIFIERS.SWITCH_MAJOR_MINOR);
+                let chord = getChordForDegree(this.props.song.key, degree, chordModifiers);
+
+                this.props.onAddChord(chord);
             }
-            if (upKeyActive) {
-                chordModifiers.push(CHORD_MODIFIERS.SHARP);
-            } else if (downKeyActive) {
-                chordModifiers.push(CHORD_MODIFIERS.FLAT);
-            }
-
-            let chord = getChordForDegree(this.getSong().key, degree, chordModifiers);
-
-            this.props.onAddChord(chord);
         }
     },
     handleKeyUp: function (e) {
@@ -144,10 +149,12 @@ const EditableSong = React.createClass({
     },
     render: function () {
         let input;
-        let song = this.getSong();
+        let song = this.props.song;
 
         if (song.inputMode === INPUT_MODES.RHYTHM) {
-            input = <TapInput document={this.props.document} />;
+            input = (<TapInput
+                document={this.props.document}
+                onSetBeats={this.props.onSetBeats} />);
         } else if (song.inputMode === INPUT_MODES.PITCH) {
             input = (<PitchInput
                 document={this.props.document}

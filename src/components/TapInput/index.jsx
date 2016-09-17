@@ -9,7 +9,7 @@ import { INPUT_MODES } from '../../constants.js';
 
 const PX_PER_BEAT = 100;
 
-let TapInput = React.createClass({
+export default React.createClass({
     getInitialState: function () {
         let beatDivisions = 4;
         let beatsPerMeasure = 4;
@@ -40,17 +40,11 @@ let TapInput = React.createClass({
         this.nextBeatNotes = [];
     },
     handleKeyDown: function (e) {
-        if (this.props.recording) {
-            if (e.key === 'Escape') {
-                this.stopRecording();
-            } else if (e.key === ' ') {
-                this.handleTap();
-            } else {
-                this.handleNote();
-            }
-            e.preventDefault();
+        if (e.key === ' ') {
+            this.handleTap();
+        } else {
+            this.handleNote();
         }
-
     },
     handleTap: function () {
         let time = Date.now();
@@ -166,7 +160,7 @@ let TapInput = React.createClass({
 
         let bestTuplet = this.chooseBestTuplet(tupletToError);
 
-        let notes = tupletToNotes[bestTuplet];
+        let notes = _.sortBy(tupletToNotes[bestTuplet], 'division');
         let nextBeatNotes = _.filter(notes, { 'nextBeat': true });
         notes.splice(notes.length - nextBeatNotes.length);
 
@@ -186,11 +180,6 @@ let TapInput = React.createClass({
     componentWillUnmount: function () {
         this.props.document.removeEventListener('keydown', this.handleKeyDown);
     },
-    componentWillReceiveProps: function (nextProps) {
-        if (this.props.recording === false && nextProps.recording === true) {
-            this.initializeTapsAndNotes();
-        }
-    },
     render: function () {
         return (
             <div className="tap-input">
@@ -198,24 +187,3 @@ let TapInput = React.createClass({
         );
     }
 });
-
-const mapStateToProps = (state) => {
-    let songState = state.editableSong.song.present;
-
-    return {
-        recording: songState.inputMode === INPUT_MODES.RHYTHM
-    };
-};
-
-const mapDispatchToProps = (dispatch) => {
-    return {
-        onSetBeats: (beats) => {
-            dispatch(setBeats(beats));
-        }
-    };
-};
-
-export default connect(
-    mapStateToProps,
-    mapDispatchToProps
-)(TapInput);

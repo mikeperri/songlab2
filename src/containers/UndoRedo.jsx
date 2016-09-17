@@ -14,7 +14,7 @@ let UndoRedo = ({ canUndo, canRedo, onUndo, onRedo }) => (
 );
 
 const mapStateToProps = (state) => {
-    let songState = state.editableSong.song;
+    let songState = state.song;
 
     return {
         canUndo: songState.past.length > 0,

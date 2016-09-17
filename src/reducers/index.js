@@ -1,8 +1,8 @@
 import { combineReducers } from 'redux';
-import editableSong from './editableSong.js';
+import song from './song.js';
 
 const reducers = combineReducers({
-    editableSong
+    song
 });
 
 export default reducers;

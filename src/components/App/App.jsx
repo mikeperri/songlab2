@@ -1,5 +1,4 @@
 import React from 'react';
-import Editor from '../../containers/Editor/';
 import EditableSong from '../../containers/EditableSong/';
 
 let testSong = {
