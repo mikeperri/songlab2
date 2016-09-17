@@ -14,6 +14,13 @@ export const setBeats = (beats) => {
     };
 };
 
+export const setPitch = (pitch) => {
+    return {
+        type: types.SET_PITCH,
+        pitch
+    };
+};
+
 export const addToPitchOffset = (delta) => {
     return {
         type: types.ADD_TO_PITCH_OFFSET,

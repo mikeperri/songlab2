@@ -13,7 +13,7 @@ export default React.createClass({
     },
     render: function () {
         let lowerPitchLimit = 21;
-        let upperPitchLimit = 33;
+        let upperPitchLimit = 60;
 
         let measureElements = this.props.measures.map((measure, index) => {
             let selection;

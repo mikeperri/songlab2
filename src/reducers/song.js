@@ -95,6 +95,23 @@ const songReducer = (state = defaultSong, action) => {
         }
 
         return Object.assign({}, state, { measures: nextMeasures });
+    } else if (action.type === 'SET_PITCH' && state.inputMode === INPUT_MODES.PITCH) {
+        let nextMeasures = _.cloneDeep(state.measures);
+        let selectedNote = _.get(nextMeasures, [
+            state.selectedMeasureIndex,
+            'tracks',
+            state.selectedTrackIndex,
+            'beats',
+            state.selectedBeatIndex,
+            'notes',
+            0 // state.selectedNoteIndex
+        ]);
+
+        if (selectedNote) {
+            selectedNote.pitch = action.pitch;
+        }
+
+        return Object.assign({}, state, { measures: nextMeasures });
     } else if (action.type === 'SELECTION_LEFT' && state.inputMode === INPUT_MODES.NORMAL) {
         let newSong = _.clone(state);
         let selectedMeasure = newSong.measures[state.selectedMeasureIndex];

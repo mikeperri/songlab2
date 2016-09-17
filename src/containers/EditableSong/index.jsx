@@ -2,6 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import _ from 'lodash';
 import TapInput from '../TapInput/';
+import PitchInput from '../../components/PitchInput/';
 import UndoRedo from '../UndoRedo.jsx';
 import SongView from '../../components/SongView/';
 import InputModeView from '../../components/InputModeView/';
@@ -10,6 +11,7 @@ import getChordForDegree, { CHORD_MODIFIERS } from '../../utils/getChordForDegre
 import { INPUT_MODES } from '../../constants.js';
 import {
     insertMeasure,
+    setPitch,
     addChord,
     selectionLeft,
     selectionRight,
@@ -32,6 +34,9 @@ const mapDispatchToProps = (dispatch) => {
         onInsertMeasure: (measureIndex) => {
             dispatch(insertMeasure(measureIndex));
         },
+        onSetPitch: (pitch) => {
+            dispatch(setPitch(pitch));
+        },
         onAddChord: (chord) => {
             dispatch(addChord(chord));
         },
@@ -53,11 +58,8 @@ const mapDispatchToProps = (dispatch) => {
         onDeleteChord: (measureIndex, beatIndex) => {
             dispatch(deleteChord(measureIndex, beatIndex));
         },
-        onStartRecording: () => {
-            dispatch(setInputMode(INPUT_MODES.RHYTHM));
-        },
-        onStopRecording: () => {
-            dispatch(setInputMode(INPUT_MODES.NORMAL));
+        onSetMode: (mode) => {
+            dispatch(setInputMode(mode));
         }
     };
 };
@@ -100,13 +102,11 @@ const EditableSong = React.createClass({
                 this.props.onDeleteMeasure(measureIndex);
             }
         } else if (e.key === 'r') {
-            if (this.props.recording) {
-                this.props.onStopRecording();
-            } else {
-                this.props.onStartRecording();
-            }
+            this.props.onSetMode(INPUT_MODES.RHYTHM);
+        } else if (e.key === 'p') {
+            this.props.onSetMode(INPUT_MODES.PITCH);
         } else if (e.key === 'Escape') {
-            this.props.onStopRecording();
+            this.props.onSetMode(INPUT_MODES.NORMAL);
         }
 
         let degree = keyboardEventToDegree(e);
@@ -143,18 +143,23 @@ const EditableSong = React.createClass({
         this.props.document.removeEventListener('keyup', this.handleKeyUp);
     },
     render: function () {
-        let tapInput;
+        let input;
         let song = this.getSong();
 
         if (song.inputMode === INPUT_MODES.RHYTHM) {
-            tapInput = <TapInput document={this.props.document} />;
+            input = <TapInput document={this.props.document} />;
+        } else if (song.inputMode === INPUT_MODES.PITCH) {
+            input = (<PitchInput
+                document={this.props.document}
+                keySignature={song.key}
+                onPitch={this.props.onSetPitch} />);
         }
 
         return (
             <div>
                 <InputModeView inputMode={song.inputMode} />
                 <UndoRedo />
-                {tapInput}
+                {input}
                 <SongView
                     keySignature={song.key}
                     measures={song.measures}
