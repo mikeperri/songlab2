@@ -23,6 +23,7 @@ import {
     selectionRight,
     selectionUp,
     selectionDown,
+    setSelectionResolution,
     deleteMeasure,
     deleteChord,
     setInputMode
@@ -59,6 +60,9 @@ const mapDispatchToProps = (dispatch) => {
         },
         onSelectionDown: () => {
             dispatch(selectionDown());
+        },
+        onSetSelectionResolution: (resolution) => {
+            dispatch(setSelectionResolution(resolution));
         },
         onDeleteMeasure: (measureIndex) => {
             dispatch(deleteMeasure(measureIndex));
@@ -112,6 +116,10 @@ const EditableSong = React.createClass({
             this.props.onSetMode(INPUT_MODES.RHYTHM);
         } else if (e.key === 'p') {
             this.props.onSetMode(INPUT_MODES.PITCH);
+        } else if (e.key === '-' || e.key === '_') {
+            this.props.onSetSelectionResolution(this.props.song.selectionResolution + 1);
+        } else if (e.key === '=' || e.key === '+') {
+            this.props.onSetSelectionResolution(this.props.song.selectionResolution - 1);
         } else {
             let degree = keyboardEventToDegree(e);
 
@@ -171,7 +179,10 @@ const EditableSong = React.createClass({
                     keySignature={song.key}
                     measures={song.measures}
                     selectedMeasureIndex={song.selectedMeasureIndex}
+                    selectedTrackIndex={song.selectedTrackIndex}
                     selectedBeatIndex={song.selectedBeatIndex}
+                    selectedDivisionIndex={song.selectedDivisionIndex}
+                    selectionResolution={song.selectionResolution}
                     />
             </div>
         );

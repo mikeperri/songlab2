@@ -3,16 +3,31 @@
     position: relative;
 }
 
-.song .selection {
-    position: absolute;
-    border: 1px solid black;
-    border-bottom: 0;
-    height: 5px;
+.song .grid .beat {
+    display: inline-block;
 }
 
-.song .measure .chord {
-    position: absolute;
+.song .grid .beat .division {
+    display: inline-block;
+    vertical-align: top;
+}
+
+.song .selected {
+    background: rgba(55, 54, 145, 0.75);
+}
+
+.song .chord-track .grid .beat .division .chord {
     font-size: 24px;
+}
+
+.song .chord-track .grid .beat .division {
+    height: 30px;
+}
+
+.song .selection {
+    position: absolute;
+    background: rgba(55, 54, 145, 0.75);
+    border-radius: 10px;
 }
 
 .song .measure.placeholder {

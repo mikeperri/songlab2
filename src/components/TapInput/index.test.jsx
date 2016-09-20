@@ -3,9 +3,9 @@ import { shallow, render, mount } from 'enzyme';
 import { expect } from 'chai';
 import sinon from 'sinon';
 
-import Input from '.';
+import TapInput from '.';
 
-describe('<Input />', () => {
+describe('<TapInput />', () => {
     let keydownCb;
     const mockDocument = {
         addEventListener: function (eventName, cb) {
@@ -18,7 +18,7 @@ describe('<Input />', () => {
     describe('the quantizeBeat function', () => {
         let wrapper;
         beforeEach(() => {
-            wrapper = mount(<Input document={mockDocument}/>);
+            wrapper = mount(<TapInput document={mockDocument}/>);
         });
         it('should quantize four quarter notes, including one that goes to the next beat', () => {
             let beatDivisions = 4;
@@ -133,10 +133,10 @@ describe('<Input />', () => {
             });
         });
     });
-    describe('once started', () => {
+    describe.only('once started', () => {
         let wrapper, clock;
         beforeEach(() => {
-            wrapper = mount(<Input document={mockDocument}/>);
+            wrapper = mount(<TapInput document={mockDocument}/>);
             clock = sinon.useFakeTimers();
             wrapper.findWhere(n => n.type() === 'button' && n.text() === 'Start').simulate('click');
         });

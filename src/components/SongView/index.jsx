@@ -8,7 +8,10 @@ export default React.createClass({
             measure: MeasureView.propTypes.measure
         })),
         selectedMeasureIndex: React.PropTypes.number,
+        selectedTrackIndex: React.PropTypes.number,
         selectedBeatIndex: React.PropTypes.number,
+        selectedDivisionIndex: React.PropTypes.number,
+        selectionResolution: React.PropTypes.number
     },
     render: function () {
         let lowerPitchLimit = 21;
@@ -20,7 +23,10 @@ export default React.createClass({
             if (index === this.props.selectedMeasureIndex) {
                 selection = {
                     measure: (this.props.selectedBeatIndex === null),
-                    beatIndex: this.props.selectedBeatIndex
+                    trackIndex: this.props.selectedTrackIndex,
+                    beatIndex: this.props.selectedBeatIndex,
+                    divisionIndex: this.props.selectedDivisionIndex,
+                    resolution: this.props.selectionResolution
                 };
             }
 

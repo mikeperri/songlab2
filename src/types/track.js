@@ -5,6 +5,7 @@ let trackPropType = React.PropTypes.shape({
         tuplet: React.PropTypes.number,
         notes: React.PropTypes.arrayOf(React.PropTypes.shape({
             division: React.PropTypes.number,
+            divisionCount: React.PropTypes.number,
             pitch: React.PropTypes.number,
             chord: React.PropTypes.string
         }))

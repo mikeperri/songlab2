@@ -8,7 +8,7 @@ export default React.createClass({
         beatWidth: React.PropTypes.number.isRequired,
         tracks: React.PropTypes.arrayOf(trackPropType),
         lowerPitchLimit: React.PropTypes.number,
-        upperPitchLimit: React.PropTypes.number
+        upperPitchLimit: React.PropTypes.number,
     },
     render: function () {
         let numberOfBeats = this.props.numberOfBeats;
@@ -16,6 +16,7 @@ export default React.createClass({
         let tracks = this.props.tracks;
         let lowerPitchLimit = this.props.lowerPitchLimit;
         let upperPitchLimit = this.props.upperPitchLimit;
+
         let notes = [];
         let height = 200;
         let noteGridStyle = {
@@ -41,6 +42,8 @@ export default React.createClass({
                             N
                         </div>
                     );
+
+                    noteIndex++;
                 });
             });
         });

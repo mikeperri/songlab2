@@ -1,5 +1,6 @@
 import React from 'react';
 import _ from 'lodash';
+import ChordTrackView from '../ChordTrackView/';
 import NoteGridView from '../NoteGridView/';
 import { trackPropType } from '../../types/track.js';
 
@@ -32,7 +33,8 @@ export default React.createClass({
                 let selectionStyle = {
                     top: 0,
                     left: 0,
-                    right: 0
+                    right: 0,
+                    bottom: 0
                 };
                 selectionElement = <div className="selection" style={selectionStyle}></div>;
             } else {
@@ -45,34 +47,23 @@ export default React.createClass({
             }
         }
 
-        let chordIndex = 0;
-        let chordElements = _.reduce(measure.chordTrack.beats, (acc, beat, beatIndex) => {
-            return acc.concat(beat.notes.map((note) => {
-                let chordStyle = {
-                    top: 10,
-                    left: beatIndex * beatWidth
-                };
-
-                return (
-                    <div className="chord"
-                        style={chordStyle}
-                        key={chordIndex++}>
-                        {note.chord}
-                    </div>
-                );
-            }));
-        }, []);
-
         return (
             <div className="measure">
                 {selectionElement}
-                {chordElements}
+                <ChordTrackView
+                    chordTrack={measure.chordTrack}
+                    beatWidth={beatWidth}
+                    selectedBeatIndex={selection && selection.beatIndex}
+                    selectedDivisionIndex={selection && selection.divisionIndex}
+                    selectionResolution={selection && selection.resolution}
+                    />
                 <NoteGridView
                     beatWidth={beatWidth}
                     numberOfBeats={numberOfBeats}
                     tracks={measure.tracks}
                     lowerPitchLimit={lowerPitchLimit}
-                    upperPitchLimit={upperPitchLimit} />
+                    upperPitchLimit={upperPitchLimit}
+                    />
             </div>
         );
     }

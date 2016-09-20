@@ -5,6 +5,7 @@ import { setBeats } from '../../actions/';
 
 import RhythmGridView from '../../components/RhythmGridView/';
 import Beat from '../../constructors/beat.js';
+import Note from '../../constructors/note.js';
 import { INPUT_MODES } from '../../constants.js';
 
 const PX_PER_BEAT = 100;
@@ -73,7 +74,7 @@ export default React.createClass({
                 tap
             );
 
-            beat.notes = beat.notes.concat(this.nextBeatNotes);
+            beat.addNotes(this.nextBeatNotes);
             this.nextBeatNotes = beat.nextBeatNotes;
 
             this.props.onSetBeats([beat]);
@@ -96,7 +97,7 @@ export default React.createClass({
         });
         this.earlyNoteTimes = [];
     },
-    getNoteInfo: function (beatDivisions, period, tuplet, msIntoBeat) {
+    buildNote: function (beatDivisions, period, tuplet, msIntoBeat) {
         let divisionCount = tuplet === 1 ? beatDivisions : tuplet;
         let divisionPeriod = period / divisionCount;
 
@@ -109,12 +110,13 @@ export default React.createClass({
             division = 0;
         }
 
-        return {
+        return new Note({
             division,
+            divisionCount,
             error,
             nextBeat,
             pitch: 21
-        };
+        });
     },
     calculateNormalizedError: function (notes) {
         let sum = _.sumBy(notes, (note) => note.error);
@@ -151,7 +153,7 @@ export default React.createClass({
             let notes = _.map(noteTimes, (noteTime) => {
                 let msIntoBeat = noteTime - tap1.time;
 
-                return this.getNoteInfo(beatDivisions, period, tuplet, msIntoBeat);
+                return this.buildNote(beatDivisions, period, tuplet, msIntoBeat);
             });
 
             tupletToNotes[tupletStr] = notes;
@@ -159,10 +161,8 @@ export default React.createClass({
         });
 
         let bestTuplet = this.chooseBestTuplet(tupletToError);
-
-        let notes = _.sortBy(tupletToNotes[bestTuplet], 'division');
+        let notes = tupletToNotes[bestTuplet];
         let nextBeatNotes = _.filter(notes, { 'nextBeat': true });
-        notes.splice(notes.length - nextBeatNotes.length);
 
         return new Beat({ notes, nextBeatNotes, tuplet: bestTuplet });
     },

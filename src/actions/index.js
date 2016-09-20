@@ -99,3 +99,10 @@ export const stopEditing = () => {
         type: types.STOP_EDITING
     };
 };
+
+export const setSelectionResolution = (resolution) => {
+    return {
+        type: types.SET_SELECTION_RESOLUTION,
+        resolution
+    }
+}

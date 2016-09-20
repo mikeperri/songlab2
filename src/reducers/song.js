@@ -2,8 +2,9 @@ import _ from 'lodash';
 import undoable from '../utils/undoable.js';
 import Measure from '../constructors/measure.js';
 import Track from '../constructors/track.js';
+import Note from '../constructors/note.js';
 import { UNDOABLE_ACTION_TYPES } from '../utils/undoable.js';
-import { INPUT_MODES } from '../constants.js';
+import { INPUT_MODES, MAX_RESOLUTION } from '../constants.js';
 
 const defaultSong = {
     key: 'C',
@@ -11,7 +12,10 @@ const defaultSong = {
     defaultNumberOfBeats: 4,
     selectedMeasureIndex: 0,
     selectedTrackIndex: 0,
+    selectedNoteIndex: 0,
     selectedBeatIndex: null,
+    selectedDivisionIndex: null,
+    selectionResolution: 1,
     inputMode: INPUT_MODES.NORMAL
 };
 
@@ -33,7 +37,7 @@ const songReducer = (state = defaultSong, action) => {
     }
 
     function createTrack(measure, trackIndex) {
-        let newTrack = new Track({});
+        let newTrack = new Track({ numberOfBeats: measure.numberOfBeats });
         measure.tracks[state.selectedTrackIndex] = newTrack;
 
         return newTrack;
@@ -76,10 +80,8 @@ const songReducer = (state = defaultSong, action) => {
         let nextMeasures = _.clone(state.measures);
 
         if (state.selectedMeasureIndex >= state.measures.length) {
-            nextMeasures.push(new Measure({
-                numberOfBeats: state.defaultNumberOfBeats,
-                chord: action.chord
-            }));
+            let nextMeasure = cloneOrCreateMeasure(nextMeasures, state.measures.length);
+            nextMeasure.setChord(action.chord);
         } else {
             // revise to allow chords on upbeats
             let nextSelectedMeasure = _.cloneDeep(nextMeasures[state.selectedMeasureIndex]);
@@ -104,7 +106,7 @@ const songReducer = (state = defaultSong, action) => {
             'beats',
             state.selectedBeatIndex,
             'notes',
-            0 // state.selectedNoteIndex
+            state.selectedNoteIndex
         ]);
 
         if (selectedNote) {
@@ -176,6 +178,7 @@ const songReducer = (state = defaultSong, action) => {
             let newSong = _.clone(state);
 
             newSong.selectedBeatIndex = null;
+            newSong.selectedDivisionIndex = null;
 
             return newSong;
         } else {
@@ -186,6 +189,7 @@ const songReducer = (state = defaultSong, action) => {
             let newSong = _.clone(state);
 
             newSong.selectedBeatIndex = 0;
+            newSong.selectedDivisionIndex = 0;
 
             return newSong;
         } else {
@@ -216,6 +220,12 @@ const songReducer = (state = defaultSong, action) => {
         } else {
             return state;
         }
+    } else if (action.type === 'SET_SELECTION_RESOLUTION') {
+        let nextSelectionResolution = _.clamp(action.resolution, 1, MAX_RESOLUTION);
+
+        return Object.assign({}, state, {
+            selectionResolution: nextSelectionResolution
+        });
     } else {
         return state;
     }

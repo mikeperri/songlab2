@@ -2,7 +2,7 @@ import getPitchForDegree from './getPitchForDegree.js';
 import { NOTE_MODIFIERS } from '../constants.js';
 import { expect } from 'chai';
 
-describe.only('getPitchForDegree', () => {
+describe('getPitchForDegree', () => {
     it('should return 21 for the 1st degree in the key of A', () => {
         expect(getPitchForDegree({key: 'A', degree: 1})).to.equal(21);
     });
