@@ -29,17 +29,19 @@ export default React.createClass({
                 let divisions = beat.tuplet === 1 ? 4 : beat.tuplet;
 
                 beat.notes.forEach((note, noteIndex) => {
+                    let pitch = note.pitch || this.props.upperPitchLimit;
+
                     let noteStyle = {
                         position: 'absolute',
-                        bottom: ((note.pitch - lowerPitchLimit) / (upperPitchLimit - lowerPitchLimit)) * height,
-                        left: (beatIndex * beatWidth) + ((note.division/divisions) * beatWidth)
+                        bottom: ((pitch - lowerPitchLimit) / (upperPitchLimit - lowerPitchLimit)) * height,
+                        left: (beatIndex * beatWidth) + ((note.division[0]/note.division[1]) * beatWidth)
                     };
 
                     notes.push(
                         <div className="note"
                             style={noteStyle}
                             key={notes.length}>
-                            N
+                            [
                         </div>
                     );
 

@@ -13,8 +13,10 @@ export default React.createClass({
     render: function () {
         let chordTrack = this.props.chordTrack;
 
-        function getDivisionContents(beat, divisionIndex) {
-            let notes = beat.notes.filter((note) => note.division === divisionIndex);
+        function getDivisionContents(beat, division) {
+            let notes = beat.notes.filter((note) => {
+                return note.division[0]/note.division[1] === division[0]/division[1];
+            });
 
             return notes.map((note, noteIndex) => {
                 return (

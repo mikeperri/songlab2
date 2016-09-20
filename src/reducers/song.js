@@ -88,7 +88,10 @@ const songReducer = (state = defaultSong, action) => {
             let selectedBeat = nextSelectedMeasure.chordTrack.beats[state.selectedBeatIndex || 0];
 
             if (selectedBeat.notes.length === 0) {
-                selectedBeat.notes.push({ division: 0 });
+                let note = new Note({
+                    division: [ 0, 1 ]
+                });
+                selectedBeat.notes.push(note);
             }
 
             selectedBeat.notes[0].chord = action.chord;

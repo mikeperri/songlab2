@@ -48,7 +48,7 @@ export default React.createClass({
                     <div className={divisionClassNames.join(' ')}
                         key={divisionIndex}
                         style={divisionStyle}>
-                        {this.props.getDivisionContents(beat, divisionIndex, beatDivisionCount)}
+                        {this.props.getDivisionContents(beat, [divisionIndex, beatDivisionCount])}
                     </div>
                 );
             });

@@ -102,21 +102,20 @@ export default React.createClass({
         let divisionPeriod = period / divisionCount;
 
         let rawDivision = msIntoBeat / divisionPeriod;
-        let division = Math.abs(Math.round(rawDivision));
-        let error = (division - rawDivision) * divisionPeriod;
-        let nextBeat = division == divisionCount;
+        let divisionNumerator = Math.abs(Math.round(rawDivision));
+        let error = (divisionNumerator - rawDivision) * divisionPeriod;
+        let nextBeat = divisionNumerator == divisionCount;
 
         if (nextBeat) {
-            division = 0;
+            divisionNumerator = 0;
         }
 
-        return new Note({
-            division,
-            divisionCount,
+        let note = new Note({
+            division: [ divisionNumerator, divisionCount ],
             error,
-            nextBeat,
-            pitch: 21
+            nextBeat
         });
+        return note;
     },
     calculateNormalizedError: function (notes) {
         let sum = _.sumBy(notes, (note) => note.error);
@@ -161,8 +160,9 @@ export default React.createClass({
         });
 
         let bestTuplet = this.chooseBestTuplet(tupletToError);
-        let notes = tupletToNotes[bestTuplet];
-        let nextBeatNotes = _.filter(notes, { 'nextBeat': true });
+        let allNotes = tupletToNotes[bestTuplet];
+        let notes = _.reject(allNotes, { 'nextBeat': true });
+        let nextBeatNotes = _.filter(allNotes, { 'nextBeat': true });
 
         return new Beat({ notes, nextBeatNotes, tuplet: bestTuplet });
     },
