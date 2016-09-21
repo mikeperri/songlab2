@@ -10,7 +10,7 @@ export default React.createClass({
         selectedMeasureIndex: React.PropTypes.number,
         selectedTrackIndex: React.PropTypes.number,
         selectedBeatIndex: React.PropTypes.number,
-        selectedDivisionIndex: React.PropTypes.number,
+        selectedDivision: React.PropTypes.arrayOf(React.PropTypes.number),
         selectionResolution: React.PropTypes.number
     },
     render: function () {
@@ -25,7 +25,7 @@ export default React.createClass({
                     measure: (this.props.selectedBeatIndex === null),
                     trackIndex: this.props.selectedTrackIndex,
                     beatIndex: this.props.selectedBeatIndex,
-                    divisionIndex: this.props.selectedDivisionIndex,
+                    division: this.props.selectedDivision,
                     resolution: this.props.selectionResolution
                 };
             }
@@ -40,19 +40,13 @@ export default React.createClass({
         let placeholderSelection = null;
 
         if (this.props.selectedMeasureIndex >= this.props.measures.length) {
-            let selectionStyle = {};
-
-            if (this.props.selectedBeatIndex !== null) {
-                selectionStyle.top = 5;
-            }
-
-            placeholderSelection = <div style={selectionStyle} className="selection"></div>;
+            placeholderSelection = <div className="selection"></div>;
         }
 
         return (
             <div className="song">
                 {measureElements}
-                <div className="measure placeholder">
+                <div className="measure-placeholder">
                     {placeholderSelection}
                 </div>
             </div>

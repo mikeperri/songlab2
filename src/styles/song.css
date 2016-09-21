@@ -3,37 +3,45 @@
     position: relative;
 }
 
-.song .grid .beat {
-    display: inline-block;
-}
-
-.song .grid .beat .division {
-    display: inline-block;
-    vertical-align: top;
-}
-
 .song .selected {
     background: rgba(55, 54, 145, 0.75);
 }
 
-.song .chord-track .grid .beat .division .chord {
+.song .chord-track .chord {
     font-size: 24px;
+    position: absolute;
 }
 
-.song .chord-track .grid .beat .division {
+.song .chord-track .grid {
     height: 30px;
 }
 
 .song .selection {
     position: absolute;
     background: rgba(55, 54, 145, 0.75);
-    border-radius: 10px;
+    min-height: 30px;
 }
 
-.song .measure.placeholder {
+.song .grid {
+    border: 1px solid black;
+}
+
+.song .grid .marker {
+    position: absolute;
+    min-height: 100%;
+    border-left-width: 1px;
+    border-left-style: solid;
+    border-left-color: black;
+    margin-top: -1px;
+    margin-bottom: -1px;
+}
+
+.song .measure-placeholder {
+    position: relative;
+    display: inline-block;
     vertical-align: top;
 }
 
-.song .measure.placeholder .selection {
+.song .measure-placeholder .selection {
     width: 50px;
 }

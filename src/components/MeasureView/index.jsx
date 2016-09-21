@@ -17,34 +17,27 @@ export default React.createClass({
         }),
         selection: React.PropTypes.shape({
             measure: React.PropTypes.bool,
-            beatIndex: React.PropTypes.number
+            beatIndex: React.PropTypes.number,
+            division: React.PropTypes.arrayOf(React.PropTypes.number)
         })
     },
     render: function () {
         let measure = this.props.measure;
         let lowerPitchLimit = this.props.lowerPitchLimit;
         let upperPitchLimit = this.props.upperPitchLimit;
-        let selection = this.props.selection;
         let numberOfBeats = measure.numberOfBeats;
+        let measureIsSelected = this.props.selection && this.props.selection.measure;
+        let selection = this.props.selection;
         let selectionElement;
 
-        if (selection) {
-            if (selection.measure === true) {
-                let selectionStyle = {
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0
-                };
-                selectionElement = <div className="selection" style={selectionStyle}></div>;
-            } else {
-                let selectionStyle = {
-                    top: 5,
-                    left: selection.beatIndex * beatWidth,
-                    width: beatWidth
-                };
-                selectionElement = <div className="selection" style={selectionStyle}></div>;
-            }
+        if (measureIsSelected) {
+            let selectionStyle = {
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0
+            };
+            selectionElement = <div className="selection" style={selectionStyle}></div>;
         }
 
         return (
@@ -53,9 +46,7 @@ export default React.createClass({
                 <ChordTrackView
                     chordTrack={measure.chordTrack}
                     beatWidth={beatWidth}
-                    selectedBeatIndex={selection && selection.beatIndex}
-                    selectedDivisionIndex={selection && selection.divisionIndex}
-                    selectionResolution={selection && selection.resolution}
+                    selection={measureIsSelected ? null : selection}
                     />
                 <NoteGridView
                     beatWidth={beatWidth}

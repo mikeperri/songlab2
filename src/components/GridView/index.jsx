@@ -7,63 +7,66 @@ export default React.createClass({
     propTypes: {
         track: trackPropType,
         beatWidth: React.PropTypes.number,
-        selectedBeatIndex: React.PropTypes.number,
-        selectedDivisionIndex: React.PropTypes.number,
-        selectionResolution: React.PropTypes.number,
-        getDivisionContents: React.PropTypes.func
+        selection: React.PropTypes.object,
+        noteClassName: React.PropTypes.string,
+        getContentForNote: React.PropTypes.func
     },
     render: function () {
-        function divisionIsSelected(props, beatIndex, divisionIndex) {
-            if (beatIndex === props.selectedBeatIndex) {
-                if (props.selectionResolution === 1) {
-                    return true;
-                } else if (props.selectionResolution === MAX_RESOLUTION) {
-                    return divisionIndex === props.selectedDivisionIndex;
-                } else {
-                    let factor = Math.pow(2, MAX_RESOLUTION - props.selectionResolution);
-                    let scaledDivisionIndex = props.selectedDivisionIndex * factor;
-                    let limit = scaledDivisionIndex + factor;
-                    return divisionIndex >= scaledDivisionIndex && divisionIndex < limit;
-                }
-            }
+        let beatWidth = this.props.beatWidth;
 
-            return beatIndex === props.selectedBeatIndex
-                && divisionIndex === props.selectedDivisionIndex;
+        function getTransformStyle(beatIndex, division) {
+            let x = (beatIndex * beatWidth) +
+                ((division[0] / division[1]) * beatWidth);
+
+            return `translateX(${x}px)`;
         }
 
-        let divisions = this.props.track.beats.map((beat, beatIndex) => {
-            let beatDivisionCount = beat.tuplet * Math.pow(2, MAX_RESOLUTION - 1);
-
-            let beatDivisions = _.range(beatDivisionCount).map((divisionIndex) => {
-                let divisionStyle = {
-                    width: this.props.beatWidth / beatDivisionCount
-                };
-                let divisionClassNames = ['division'];
-
-                if (divisionIsSelected(this.props, beatIndex, divisionIndex)) {
-                    divisionClassNames.push('selected');
-                }
+        let noteCount = 0;
+        let noteElements = _.flatMap(this.props.track.beats, (beat, beatIndex) => {
+            return beat.notes.map((note, noteIndex) => {
+                let transformStyle = getTransformStyle(beatIndex, note.division);
+                let noteStyle = { transform: transformStyle };
 
                 return (
-                    <div className={divisionClassNames.join(' ')}
-                        key={divisionIndex}
-                        style={divisionStyle}>
-                        {this.props.getDivisionContents(beat, [divisionIndex, beatDivisionCount])}
+                    <div className={this.props.noteClassName}
+                        style={noteStyle}
+                        key={noteCount++}>
+                        {this.props.getContentForNote(note)}
                     </div>
                 );
             });
+        });
 
-            return (
-                <div className="beat"
-                    key={beatIndex}>
-                    {beatDivisions}
-                </div>
-            );
+        let selectionElement = null;
+
+        if (this.props.selection) {
+            let beatIndex = this.props.selection.beatIndex;
+            let division = this.props.selection.division;
+            let transformStyle = getTransformStyle(beatIndex, division);
+            let selectionStyle = {
+                transform: transformStyle,
+                width: beatWidth / (1 << this.props.selection.resolution)
+            };
+
+            selectionElement = <div className="selection" style={selectionStyle}></div>;
+        }
+
+        let gridStyle = {
+            width: beatWidth * this.props.track.beats.length
+        };
+
+        let markerElements = this.props.track.beats.map((beat, beatIndex) => {
+            let transformStyle = getTransformStyle(beatIndex, [0, 1]);
+            let markerStyle = { transform: transformStyle };
+
+            return <div className="marker" style={markerStyle} key={beatIndex}></div>;
         });
 
         return (
-            <div className="grid">
-                {divisions}
+            <div className="grid" style={gridStyle}>
+                {markerElements}
+                {selectionElement}
+                {noteElements}
             </div>
         );
     }

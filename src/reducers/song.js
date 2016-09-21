@@ -4,7 +4,11 @@ import Measure from '../constructors/measure.js';
 import Track from '../constructors/track.js';
 import Note from '../constructors/note.js';
 import { UNDOABLE_ACTION_TYPES } from '../utils/undoable.js';
-import { INPUT_MODES, MAX_RESOLUTION } from '../constants.js';
+import { INPUT_MODES } from '../constants.js';
+
+import selectionLeft from './selectionLeft.js';
+import selectionRight from './selectionRight.js';
+import setSelectionResolution from './setSelectionResolution/';
 
 const defaultSong = {
     key: 'C',
@@ -14,8 +18,8 @@ const defaultSong = {
     selectedTrackIndex: 0,
     selectedNoteIndex: 0,
     selectedBeatIndex: null,
-    selectedDivisionIndex: null,
-    selectionResolution: 1,
+    selectedDivision: [0, 1],
+    selectionResolution: 0,
     inputMode: INPUT_MODES.NORMAL
 };
 
@@ -118,64 +122,9 @@ const songReducer = (state = defaultSong, action) => {
 
         return Object.assign({}, state, { measures: nextMeasures });
     } else if (action.type === 'SELECTION_LEFT' && state.inputMode === INPUT_MODES.NORMAL) {
-        let newSong = _.clone(state);
-        let selectedMeasure = newSong.measures[state.selectedMeasureIndex];
-
-        function tryToDecrementMeasure() {
-            if (state.selectedMeasureIndex > 0) {
-                if (state.selectedMeasureIndex >= state.measures.length) {
-                    newSong.selectedMeasureIndex = state.measures.length - 1;
-                } else {
-                    newSong.selectedMeasureIndex--;
-                }
-                return true;
-            } else {
-                return false;
-            }
-        }
-
-        if (state.selectedBeatIndex !== null) {
-            if (state.selectedBeatIndex > 0) {
-                newSong.selectedBeatIndex--;
-            } else {
-                let decremented = tryToDecrementMeasure();
-                if (decremented) {
-                    selectedMeasure = newSong.measures[newSong.selectedMeasureIndex];
-                    newSong.selectedBeatIndex = selectedMeasure.numberOfBeats - 1;
-                }
-            }
-        } else {
-            tryToDecrementMeasure();
-        }
-
-        return newSong;
+        return selectionLeft(state);
     } else if (action.type === 'SELECTION_RIGHT' && state.inputMode === INPUT_MODES.NORMAL) {
-        let newSong = _.clone(state);
-        let selectedMeasure = newSong.measures[state.selectedMeasureIndex];
-
-        function tryToIncrementMeasure() {
-            if (state.selectedMeasureIndex < state.measures.length) {
-                newSong.selectedMeasureIndex++;
-                return true;
-            } else {
-                return false;
-            }
-        }
-
-        if (state.selectedBeatIndex !== null && selectedMeasure) {
-            if (state.selectedBeatIndex < selectedMeasure.numberOfBeats - 1) {
-                newSong.selectedBeatIndex++;
-            } else {
-                let incremented = tryToIncrementMeasure();
-                if (incremented) {
-                    newSong.selectedBeatIndex = 0;
-                }
-            }
-        } else {
-            tryToIncrementMeasure();
-        }
-
-        return newSong;
+        return selectionRight(state);
     } else if (action.type === 'SELECTION_UP' && state.inputMode === INPUT_MODES.NORMAL) {
         if (state.selectedBeatIndex !== null) {
             let newSong = _.clone(state);
@@ -224,11 +173,7 @@ const songReducer = (state = defaultSong, action) => {
             return state;
         }
     } else if (action.type === 'SET_SELECTION_RESOLUTION') {
-        let nextSelectionResolution = _.clamp(action.resolution, 1, MAX_RESOLUTION);
-
-        return Object.assign({}, state, {
-            selectionResolution: nextSelectionResolution
-        });
+        return setSelectionResolution(state, action);
     } else {
         return state;
     }

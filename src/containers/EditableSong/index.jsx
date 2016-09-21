@@ -181,7 +181,7 @@ const EditableSong = React.createClass({
                     selectedMeasureIndex={song.selectedMeasureIndex}
                     selectedTrackIndex={song.selectedTrackIndex}
                     selectedBeatIndex={song.selectedBeatIndex}
-                    selectedDivisionIndex={song.selectedDivisionIndex}
+                    selectedDivision={song.selectedDivision}
                     selectionResolution={song.selectionResolution}
                     />
             </div>
