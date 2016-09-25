@@ -196,7 +196,8 @@ const songReducer = (state = defaultSong, action) => {
         return setSelectionResolution(state, action);
     } else if (action.type === 'SET_SELECTION_TUPLET') {
         return Object.assign(_.clone(state), {
-            selectionTuplet: action.tuplet
+            selectionTuplet: action.tuplet,
+            selectedDivision: new Division(0, 1)
         });
     } else {
         return state;
