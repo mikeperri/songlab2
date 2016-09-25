@@ -6,6 +6,7 @@ import { setBeats } from '../../actions/';
 import RhythmGridView from '../../components/RhythmGridView/';
 import Beat from '../../constructors/beat.js';
 import Note from '../../constructors/note.js';
+import Division from '../../constructors/division';
 import { INPUT_MODES } from '../../constants.js';
 
 const PX_PER_BEAT = 100;
@@ -111,7 +112,7 @@ export default React.createClass({
         }
 
         let note = new Note({
-            division: [ divisionNumerator, divisionCount ],
+            division: new Division(divisionNumerator, divisionCount),
             error,
             nextBeat
         });

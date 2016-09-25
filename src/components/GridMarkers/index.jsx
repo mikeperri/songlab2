@@ -1,7 +1,6 @@
 import React from 'react';
 import PureRenderMixin from 'react-addons-pure-render-mixin';
 import _ from 'lodash';
-import { trackPropType } from '../../types/track.js';
 import { MAX_RESOLUTION } from '../../constants.js';
 import getTransformStyle from '../../utils/getTransformStyle.js';
 

@@ -10,7 +10,7 @@ export default React.createClass({
         selectedMeasureIndex: React.PropTypes.number,
         selectedTrackIndex: React.PropTypes.number,
         selectedBeatIndex: React.PropTypes.number,
-        selectedDivision: React.PropTypes.arrayOf(React.PropTypes.number),
+        selectedDivision: React.PropTypes.object,
         selectionResolution: React.PropTypes.number
     },
     render: function () {

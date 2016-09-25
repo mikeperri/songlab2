@@ -4,6 +4,7 @@ import { expect } from 'chai';
 import sinon from 'sinon';
 
 import TapInput from '.';
+import Division from '../../constructors/division';
 
 describe('<TapInput />', () => {
     let keydownCb;
@@ -41,29 +42,29 @@ describe('<TapInput />', () => {
                 tuplet: 1,
                 notes: [
                     {
-                        division: [ 0, 4 ],
+                        division: new Division(0, 4),
                         error: 0,
                         nextBeat: false
                     },
                     {
-                        division: [ 1, 4 ],
+                        division: new Division(1, 4),
                         error: 0,
                         nextBeat: false
                     },
                     {
-                        division: [ 2, 4 ],
+                        division: new Division(2, 4),
                         error: 0,
                         nextBeat: false
                     },
                     {
-                        division: [ 3, 4 ],
+                        division: new Division(3, 4),
                         error: 0,
                         nextBeat: false
                     }
                 ],
                 nextBeatNotes: [
                     {
-                        division: [ 0, 4 ],
+                        division: new Division(0, 4),
                         error: 0,
                         nextBeat: true
                     }
@@ -89,17 +90,17 @@ describe('<TapInput />', () => {
                 tuplet: 3,
                 notes: [
                     {
-                        division: [ 0, 3 ],
+                        division: new Division(0, 3),
                         error: 0,
                         nextBeat: false
                     },
                     {
-                        division: [ 1, 3 ],
+                        division: new Division(1, 3),
                         error: 0.33333333333333737,
                         nextBeat: false
                     },
                     {
-                        division: [ 2, 3 ],
+                        division: new Division(2, 3),
                         error: 0.6666666666666747,
                         nextBeat: false
                     }
@@ -126,7 +127,7 @@ describe('<TapInput />', () => {
                 tuplet: 1,
                 notes: [
                     {
-                        division: [ 0, 4 ],
+                        division: new Division(0, 4),
                         error: 5,
                         nextBeat: false
                     }

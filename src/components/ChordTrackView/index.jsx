@@ -1,12 +1,13 @@
 import React from 'react';
-import { trackPropType } from '../../types/track.js';
+import trackPropType from '../../propTypes/track.js';
+import selectionPropType from '../../propTypes/selection.js';
 import GridView from '../GridView/';
 
 export default React.createClass({
     propTypes: {
         chordTrack: trackPropType,
         beatWidth: React.PropTypes.number,
-        selection: React.PropTypes.object
+        selection: selectionPropType
     },
     render: function () {
         let chordTrack = this.props.chordTrack;

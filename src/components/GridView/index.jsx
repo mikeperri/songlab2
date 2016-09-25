@@ -1,6 +1,6 @@
 import React from 'react';
 import _ from 'lodash';
-import { trackPropType } from '../../types/track.js';
+import trackPropType from '../../propTypes/track.js';
 import { MAX_RESOLUTION } from '../../constants.js';
 import getTransformStyle from '../../utils/getTransformStyle.js';
 
@@ -12,7 +12,8 @@ export default React.createClass({
         beatWidth: React.PropTypes.number,
         selection: React.PropTypes.object,
         noteClassName: React.PropTypes.string,
-        getContentForNote: React.PropTypes.func
+        getContentForNote: React.PropTypes.func,
+        getStyleForNote: React.PropTypes.func
     },
     render: function () {
         let beatWidth = this.props.beatWidth;
@@ -22,6 +23,10 @@ export default React.createClass({
             return beat.notes.map((note, noteIndex) => {
                 let transformStyle = getTransformStyle(beatIndex, note.division, beatWidth);
                 let noteStyle = { transform: transformStyle };
+
+                if (this.props.getStyleForNote) {
+                    Object.assign(noteStyle, this.props.getStyleForNote(note));
+                }
 
                 return (
                     <div className={this.props.noteClassName}

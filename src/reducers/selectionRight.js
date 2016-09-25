@@ -1,3 +1,5 @@
+import Division from '../constructors/division';
+
 export default function selectionRight(state) {
     let nextSong = _.clone(state);
     let selectedMeasure = nextSong.measures[state.selectedMeasureIndex];
@@ -26,14 +28,16 @@ export default function selectionRight(state) {
 
     function tryToIncrementDivision() {
         if (state.selectionResolution > 0) {
-            let nextDivision = [ state.selectedDivision[0] + 1, 1 << state.selectionResolution ];
+            let nextDivision = new Division(state.selectedDivision[0] + 1, 1 << state.selectionResolution);
 
             if (nextDivision[0] < nextDivision[1]) {
                 nextSong.selectedDivision = nextDivision;
             } else {
                 let incremented = tryToIncrementBeat();
                 if (incremented) {
-                    nextSong.selectedDivision = [0, 1];
+                    nextDivision[0] = 0;
+                    nextDivision[1] = 1;
+                    nextSong.selectedDivision = nextDivision;
                 }
             }
         } else {

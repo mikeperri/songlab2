@@ -1,18 +1,24 @@
 import Track from './track.js';
 import Beat from './beat.js';
 import Note from './note.js';
+import Division from './division';
 
 export default class ChordTrack extends Track {
-    setChord(chord, beatIndex = 0, division = [ 0, 1 ], divisionCount = 1) {
-        let notes = this.beats[beatIndex].notes.filter((note) => note.division === division);
+    setChord({ chord, beatIndex = 0, division = new Division(0, 1) }) {
+        let allNotes = this.beats[beatIndex].notes;
+        let note = allNotes.filter((note) => note.division.eq(division))[0];
 
-        if (notes.length > 0) {
-            notes[0].chord = chord;
+        if (note) {
+            note.chord = chord;
         } else {
             this.beats[beatIndex].addNote(new Note({
                 division,
                 chord
             }));
         }
+    }
+    deleteChord({ beatIndex, division }) {
+        let beat = this.beats[beatIndex];
+        beat.notes = beat.notes.filter((note) => !note.division.eq(division));
     }
 };

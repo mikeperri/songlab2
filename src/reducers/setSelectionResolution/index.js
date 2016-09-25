@@ -15,7 +15,7 @@ export default function setSelectionResolution(state, action) {
 
     nextDivision[1] = 1 << nextSelectionResolution;
 
-    return Object.assign({}, state, {
+    return Object.assign(_.clone(state), {
         selectionResolution: nextSelectionResolution,
         selectedDivision: nextDivision
     });

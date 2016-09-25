@@ -1,3 +1,5 @@
+import Division from '../constructors/division';
+
 export default function selectionLeft(state) {
     let nextSong = _.clone(state);
     let selectedMeasure = nextSong.measures[state.selectedMeasureIndex];
@@ -31,7 +33,7 @@ export default function selectionLeft(state) {
 
     function tryToDecrementDivision() {
         if (state.selectionResolution > 0) {
-            let nextDivision = [ state.selectedDivision[0] - 1, 1 << state.selectionResolution ];
+            let nextDivision = new Division(state.selectedDivision[0] - 1, 1 << state.selectionResolution);
 
             if (nextDivision[0] >= 0) {
                 nextSong.selectedDivision = nextDivision;

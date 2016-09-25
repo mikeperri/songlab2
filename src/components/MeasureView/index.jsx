@@ -2,7 +2,8 @@ import React from 'react';
 import _ from 'lodash';
 import ChordTrackView from '../ChordTrackView/';
 import NoteGridView from '../NoteGridView/';
-import { trackPropType } from '../../types/track.js';
+import trackPropType from '../../propTypes/track.js';
+import selectionPropType from '../../propTypes/selection.js';
 
 const beatWidth = 50;
 
@@ -15,19 +16,15 @@ export default React.createClass({
             chordTrack: trackPropType,
             tracks: React.PropTypes.arrayOf(trackPropType)
         }),
-        selection: React.PropTypes.shape({
-            measure: React.PropTypes.bool,
-            beatIndex: React.PropTypes.number,
-            division: React.PropTypes.arrayOf(React.PropTypes.number)
-        })
+        selection: selectionPropType
     },
     render: function () {
         let measure = this.props.measure;
         let lowerPitchLimit = this.props.lowerPitchLimit;
         let upperPitchLimit = this.props.upperPitchLimit;
         let numberOfBeats = measure.numberOfBeats;
-        let measureIsSelected = this.props.selection && this.props.selection.measure;
         let selection = this.props.selection;
+        let measureIsSelected = selection && selection.measure;
         let selectionElement;
 
         if (measureIsSelected) {
@@ -40,21 +37,36 @@ export default React.createClass({
             selectionElement = <div className="selection" style={selectionStyle}></div>;
         }
 
+        let trackElements = measure.tracks.map((track, trackIndex) => {
+            let trackIsSelected = selection && !selection.measure && selection.trackIndex === trackIndex;
+            let trackParams = track.getTrackParams();
+
+            if (trackParams.type === 'chord') {
+                return <ChordTrackView
+                    chordTrack={track}
+                    beatWidth={beatWidth}
+                    selection={trackIsSelected ? selection : null}
+                    key={trackIndex}
+                    />;
+            } else if (trackParams.type === 'note') {
+                return <NoteGridView
+                    track={track}
+                    beatWidth={beatWidth}
+                    numberOfBeats={numberOfBeats}
+                    lowerPitchLimit={lowerPitchLimit}
+                    upperPitchLimit={upperPitchLimit}
+                    selection={trackIsSelected ? selection : null}
+                    key={trackIndex}
+                    />;
+            }
+        });
+
         return (
             <div className="measure">
                 {selectionElement}
-                <ChordTrackView
-                    chordTrack={measure.chordTrack}
-                    beatWidth={beatWidth}
-                    selection={measureIsSelected ? null : selection}
-                    />
-                <NoteGridView
-                    beatWidth={beatWidth}
-                    numberOfBeats={numberOfBeats}
-                    tracks={measure.tracks}
-                    lowerPitchLimit={lowerPitchLimit}
-                    upperPitchLimit={upperPitchLimit}
-                    />
+                <div>
+                    {trackElements}
+                </div>
             </div>
         );
     }

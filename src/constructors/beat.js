@@ -7,7 +7,7 @@ export default class Beat {
     }
     addNote(note) {
         for (var i = 0; i < this.notes.length; i++) {
-            if (this.notes[i].division >= note.division) {
+            if (this.notes[i].division.gte(note.division)) {
                 this.notes.splice(i, 0, note);
                 return;
             }
