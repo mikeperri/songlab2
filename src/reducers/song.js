@@ -168,21 +168,22 @@ const songReducer = (state = defaultSong, action) => {
             measures: nextMeasures,
             selectedBeatIndex: nextSelectedBeatIndex
         });
-    } else if (action.type === 'DELETE_CHORD' && state.inputMode === INPUT_MODES.NORMAL) {
+    } else if (action.type === 'DELETE_NOTE' && state.inputMode === INPUT_MODES.NORMAL) {
         let selectedMeasure = state.measures[state.selectedMeasureIndex];
 
         if (selectedMeasure && state.selectedBeatIndex !== null) {
             let nextMeasures = _.clone(state.measures);
-            let nextSelectedMeasure = _.cloneDeep(selectedMeasure);
-            let chordTrack = nextSelectedMeasure.getChordTrack();
+            let nextSelectedMeasure = _.clone(nextMeasures[state.selectedMeasureIndex]);
+            let nextTracks = _.clone(nextSelectedMeasure.tracks);
+            let nextSelectedTrack = _.cloneDeep(nextTracks[state.selectedTrackIndex]);
 
-            if (chordTrack) {
-                chordTrack.deleteChord({
-                    beatIndex: state.selectedBeatIndex,
-                    division: state.selectedDivision
-                });
-            }
+            nextSelectedTrack.deleteNote({
+                beatIndex: state.selectedBeatIndex,
+                division: state.selectedDivision
+            });
 
+            nextTracks[state.selectedTrackIndex] = nextSelectedTrack;
+            nextSelectedMeasure.tracks = nextTracks;
             nextMeasures[state.selectedMeasureIndex] = nextSelectedMeasure;
 
             return Object.assign(_.clone(state), {

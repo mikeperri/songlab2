@@ -81,9 +81,9 @@ export const deleteMeasure = (measureIndex) => {
     };
 };
 
-export const deleteChord = (measureIndex, beatIndex) => {
+export const deleteNote = (measureIndex, beatIndex) => {
     return {
-        type: types.DELETE_CHORD,
+        type: types.DELETE_NOTE,
         measureIndex,
         beatIndex
     };

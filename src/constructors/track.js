@@ -10,4 +10,8 @@ export default class Track {
         });
         this.getTrackParams = _.partial(getTrackParams, id);
     }
+    deleteNote({ beatIndex, division }) {
+        let beat = this.beats[beatIndex];
+        beat.notes = beat.notes.filter((note) => !note.division.eq(division));
+    }
 };

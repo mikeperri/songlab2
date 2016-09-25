@@ -26,7 +26,7 @@ import {
     setSelectionResolution,
     setSelectionTuplet,
     deleteMeasure,
-    deleteChord,
+    deleteNote,
     setInputMode
 } from '../../actions/';
 
@@ -71,8 +71,8 @@ const mapDispatchToProps = (dispatch) => {
         onDeleteMeasure: (measureIndex) => {
             dispatch(deleteMeasure(measureIndex));
         },
-        onDeleteChord: (measureIndex, beatIndex) => {
-            dispatch(deleteChord(measureIndex, beatIndex));
+        onDeleteNote: (measureIndex, beatIndex) => {
+            dispatch(deleteNote(measureIndex, beatIndex));
         },
         onSetMode: (mode) => {
             dispatch(setInputMode(mode));
@@ -112,7 +112,7 @@ const EditableSong = React.createClass({
             let beatIndex = this.props.song.selectedBeatIndex;
 
             if (beatIndex !== null) {
-                this.props.onDeleteChord(measureIndex, beatIndex);
+                this.props.onDeleteNote(measureIndex, beatIndex);
             } else {
                 this.props.onDeleteMeasure(measureIndex);
             }
