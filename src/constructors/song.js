@@ -19,6 +19,7 @@ export default class Song {
         selectedBeatIndex = null,
         selectedDivision = new Division(0, 1),
         selectionResolution = 0,
+        selectionTuplet = 1,
         inputMode = INPUT_MODES.NORMAL
     }) {
         this.key = key;
@@ -33,6 +34,7 @@ export default class Song {
         this.selectedBeatIndex = selectedBeatIndex;
         this.selectedDivision = selectedDivision;
         this.selectionResolution = selectionResolution;
+        this.selectionTuplet = selectionTuplet;
         this.inputMode = inputMode;
     }
     getNote({ measureIndex, trackIndex, beatIndex, division }) {

@@ -53,7 +53,7 @@ const songReducer = (state = defaultSong, action) => {
 
     if (action.type === 'SET_INPUT_MODE') {
         return Object.assign(_.clone(state), { inputMode: action.inputMode });
-    } else if (action.type === 'SET_BEATS') {
+    } else if (action.type === 'SET_BEAT') {
         if (state.selectedTrackIndex === null) {
             return state;
         }
@@ -63,7 +63,8 @@ const songReducer = (state = defaultSong, action) => {
         let selectedTrack = nextSelectedMeasure.tracks[state.selectedTrackIndex] || createTrack(nextSelectedMeasure);
         let selectedBeatIndex = state.selectedBeatIndex || 0;
 
-        selectedTrack.beats.splice(selectedBeatIndex, action.beats.length, ...action.beats);
+        selectedTrack.tuplets[selectedBeatIndex] = action.tuplet;
+        selectedTrack.beats.splice(selectedBeatIndex, 1, action.beat);
 
         nextMeasures[state.selectedMeasureIndex] = nextSelectedMeasure;
 
@@ -192,6 +193,10 @@ const songReducer = (state = defaultSong, action) => {
         }
     } else if (action.type === 'SET_SELECTION_RESOLUTION') {
         return setSelectionResolution(state, action);
+    } else if (action.type === 'SET_SELECTION_TUPLET') {
+        return Object.assign(_.clone(state), {
+            selectionTuplet: action.tuplet
+        });
     } else {
         return state;
     }

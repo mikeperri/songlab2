@@ -67,18 +67,19 @@ export default React.createClass({
         if (this.taps.length === 1) {
             this.flushEarlyNotes();
         } else {
-            let beat = this.quantizeBeat(
+            let { notes, nextBeatNotes, tuplet } = this.quantizeBeat(
                 this.state.beatDivisions,
                 this.state.tuplets,
                 this.pendingNoteTimes,
                 prevTap,
                 tap
             );
+            let beat = new Beat({ notes, nextBeatNotes });
 
             beat.addNotes(this.nextBeatNotes);
             this.nextBeatNotes = beat.nextBeatNotes;
 
-            this.props.onSetBeats([beat]);
+            this.props.onSetBeat(beat);
             this.pendingNoteTimes = [];
         }
     },
@@ -165,7 +166,7 @@ export default React.createClass({
         let notes = _.reject(allNotes, { 'nextBeat': true });
         let nextBeatNotes = _.filter(allNotes, { 'nextBeat': true });
 
-        return new Beat({ notes, nextBeatNotes, tuplet: bestTuplet });
+        return { notes, nextBeatNotes, tuplet: bestTuplet };
     },
     getPeriod: function (taps) {
         let sum = 0;

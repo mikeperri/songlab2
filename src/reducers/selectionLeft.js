@@ -32,8 +32,9 @@ export default function selectionLeft(state) {
     }
 
     function tryToDecrementDivision() {
-        if (state.selectionResolution > 0) {
-            let nextDivision = new Division(state.selectedDivision[0] - 1, 1 << state.selectionResolution);
+        if (state.selectionResolution > 0 || state.selectionTuplet !== 1) {
+            let denominator = (1 << state.selectionResolution) * state.selectionTuplet;
+            let nextDivision = new Division(state.selectedDivision[0] - 1, denominator);
 
             if (nextDivision[0] >= 0) {
                 nextSong.selectedDivision = nextDivision;

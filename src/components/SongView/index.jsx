@@ -26,7 +26,8 @@ export default React.createClass({
                     trackIndex: this.props.selectedTrackIndex,
                     beatIndex: this.props.selectedBeatIndex,
                     division: this.props.selectedDivision,
-                    resolution: this.props.selectionResolution
+                    resolution: this.props.selectionResolution,
+                    tuplet: this.props.selectionTuplet
                 };
             }
 

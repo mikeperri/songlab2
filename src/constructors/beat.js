@@ -1,9 +1,8 @@
 export default class Beat {
-    constructor({ notes = [], nextBeatNotes = [], tuplet = 1 }) {
+    constructor({ notes = [], nextBeatNotes = [] }) {
         this.notes = [];
         this.addNotes(notes);
         this.nextBeatNotes = nextBeatNotes;
-        this.tuplet = tuplet;
     }
     addNote(note) {
         for (var i = 0; i < this.notes.length; i++) {

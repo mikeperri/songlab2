@@ -16,7 +16,7 @@ import getChordForDegree, { CHORD_MODIFIERS } from '../../utils/getChordForDegre
 import { INPUT_MODES } from '../../constants.js';
 import {
     insertMeasure,
-    setBeats,
+    setBeat,
     setPitch,
     addChord,
     selectionLeft,
@@ -24,6 +24,7 @@ import {
     selectionUp,
     selectionDown,
     setSelectionResolution,
+    setSelectionTuplet,
     deleteMeasure,
     deleteChord,
     setInputMode
@@ -40,8 +41,8 @@ const mapDispatchToProps = (dispatch) => {
         onInsertMeasure: (measureIndex) => {
             dispatch(insertMeasure(measureIndex));
         },
-        onSetBeats: (beats) => {
-            dispatch(setBeats(beats));
+        onSetBeat: (beat, tuplet) => {
+            dispatch(setBeat(beat, tuplet));
         },
         onSetPitch: (pitch) => {
             dispatch(setPitch(pitch));
@@ -63,6 +64,9 @@ const mapDispatchToProps = (dispatch) => {
         },
         onSetSelectionResolution: (resolution) => {
             dispatch(setSelectionResolution(resolution));
+        },
+        onSetSelectionTuplet: (tuplet) => {
+            dispatch(setSelectionTuplet(tuplet));
         },
         onDeleteMeasure: (measureIndex) => {
             dispatch(deleteMeasure(measureIndex));
@@ -120,6 +124,10 @@ const EditableSong = React.createClass({
             this.props.onSetSelectionResolution(this.props.song.selectionResolution + 1);
         } else if (e.key === '=' || e.key === '+') {
             this.props.onSetSelectionResolution(this.props.song.selectionResolution - 1);
+        } else if (e.key === 't') {
+            let tuplet = this.props.song.selectionTuplet;
+            let nextTuplet = tuplet === 3 ? 1 : 3;
+            this.props.onSetSelectionTuplet(nextTuplet);
         } else {
             let degree = keyboardEventToDegree(e);
 
@@ -162,12 +170,14 @@ const EditableSong = React.createClass({
         if (song.inputMode === INPUT_MODES.RHYTHM) {
             input = (<TapInput
                 document={this.props.document}
-                onSetBeats={this.props.onSetBeats} />);
+                onSetBeat={this.props.onSetBeat}
+                />);
         } else if (song.inputMode === INPUT_MODES.PITCH) {
             input = (<PitchInput
                 document={this.props.document}
                 keySignature={song.key}
-                onPitch={this.props.onSetPitch} />);
+                onPitch={this.props.onSetPitch}
+                />);
         }
 
         return (
@@ -183,6 +193,7 @@ const EditableSong = React.createClass({
                     selectedBeatIndex={song.selectedBeatIndex}
                     selectedDivision={song.selectedDivision}
                     selectionResolution={song.selectionResolution}
+                    selectionTuplet={song.selectionTuplet}
                     />
             </div>
         );

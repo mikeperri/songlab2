@@ -7,10 +7,11 @@ export const setInputMode = (inputMode) => {
     };
 };
 
-export const setBeats = (beats) => {
+export const setBeat = (beat, tuplet) => {
     return {
-        type: types.SET_BEATS,
-        beats
+        type: types.SET_BEAT,
+        beat,
+        tuplet
     };
 };
 
@@ -104,5 +105,12 @@ export const setSelectionResolution = (resolution) => {
     return {
         type: types.SET_SELECTION_RESOLUTION,
         resolution
+    }
+}
+
+export const setSelectionTuplet = (tuplet) => {
+    return {
+        type: types.SET_SELECTION_TUPLET,
+        tuplet
     }
 }

@@ -43,10 +43,11 @@ export default React.createClass({
         if (this.props.selection) {
             let beatIndex = this.props.selection.beatIndex;
             let division = this.props.selection.division;
+            let tuplet = this.props.selection.tuplet;
             let transformStyle = getTransformStyle(beatIndex, division, beatWidth);
             let selectionStyle = {
                 transform: transformStyle,
-                width: beatWidth / (1 << this.props.selection.resolution)
+                width: beatWidth / ((1 << this.props.selection.resolution) *  tuplet)
             };
 
             selectionElement = <div className="selection" style={selectionStyle}></div>;
