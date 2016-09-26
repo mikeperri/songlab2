@@ -23,13 +23,20 @@ export default React.createClass({
             return beat.notes.map((note, noteIndex) => {
                 let transformStyle = getTransformStyle(beatIndex, note.division, beatWidth);
                 let noteStyle = { transform: transformStyle };
+                let classNames = [ this.props.noteClassName ];
 
                 if (this.props.getStyleForNote) {
                     Object.assign(noteStyle, this.props.getStyleForNote(note));
                 }
 
+                if (this.props.selection &&
+                    this.props.selection.beatIndex === beatIndex &&
+                    this.props.selection.division.eq(note.division)) {
+                    classNames.push('selected');
+                }
+
                 return (
-                    <div className={this.props.noteClassName}
+                    <div className={classNames.join(' ')}
                         style={noteStyle}
                         key={noteCount++}>
                         {this.props.getContentForNote(note)}

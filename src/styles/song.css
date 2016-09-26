@@ -4,7 +4,8 @@
 }
 
 .song .selected {
-    background: rgba(55, 54, 145, 0.75);
+    font-weight: bold;
+    color: #0010ff;
 }
 
 .song .chord-track .chord {
