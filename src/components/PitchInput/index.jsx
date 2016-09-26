@@ -43,7 +43,7 @@ export default React.createClass({
                     octave,
                     modifier: this.modifier
                 });
-                this.props.onPitch(pitch);
+                this.props.onSetNote({ pitch });
             }
         }
     },

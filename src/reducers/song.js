@@ -7,7 +7,9 @@ import Note from '../constructors/note.js';
 import Division from '../constructors/division';
 import { UNDOABLE_ACTION_TYPES } from '../utils/undoable.js';
 import { INPUT_MODES } from '../constants.js';
+import clonePath from '../utils/clonePath';
 
+import setNote from './setNote.js';
 import selectionLeft from './selectionLeft.js';
 import selectionRight from './selectionRight.js';
 import setSelectionResolution from './setSelectionResolution/';
@@ -15,41 +17,6 @@ import setSelectionResolution from './setSelectionResolution/';
 const defaultSong = new Song({});
 
 const songReducer = (state = defaultSong, action) => {
-    function getTrackParams(id) {
-        return Object.assign({}, state.defaultTrackParams, state.perTrackParams[id]);
-    }
-
-    function createDefaultMeasure() {
-        return new Measure({
-            numberOfBeats: state.defaultNumberOfBeats,
-            defaultTuplet: state.defaultTuplet,
-            trackIds: Object.keys(state.perTrackParams),
-            getTrackParams
-        });
-    }
-
-    function cloneOrCreateMeasure(measures, measureIndex) {
-        if (measures[measureIndex]) {
-            return _.cloneDeep(measures[measureIndex]);
-        }
-
-        let newMeasure = createDefaultMeasure();
-
-        if (_.isUndefined(measureIndex)) {
-            measures.push(newMeasure);
-        } else {
-            measures.splice(measureIndex, 0, newMeasure);
-        }
-
-        return newMeasure;
-    }
-
-    function createTrack(measure, trackIndex) {
-        let newTrack = new Track({ numberOfBeats: measure.numberOfBeats });
-        measure.tracks.push(newTrack);
-
-        return newTrack;
-    }
 
     if (action.type === 'SET_INPUT_MODE') {
         return Object.assign(_.clone(state), { inputMode: action.inputMode });
@@ -58,80 +25,51 @@ const songReducer = (state = defaultSong, action) => {
             return state;
         }
 
-        let nextMeasures = _.clone(state.measures);
-        let nextSelectedMeasure = cloneOrCreateMeasure(nextMeasures, state.selectedMeasureIndex);
-        let selectedTrack = nextSelectedMeasure.tracks[state.selectedTrackIndex] || createTrack(nextSelectedMeasure);
+        let selectedTrackIndex = state.selectedTrackIndex || 0;
         let selectedBeatIndex = state.selectedBeatIndex || 0;
 
-        selectedTrack.tuplets[selectedBeatIndex] = action.tuplet;
-        selectedTrack.beats.splice(selectedBeatIndex, 1, action.beat);
+        let nextState = clonePath({
+            state,
+            measureIndex: state.selectedMeasureIndex,
+            trackIndex: selectedTrackIndex,
+            beatIndex: selectedBeatIndex,
+            division: state.selectedDivision
+        });
 
-        nextMeasures[state.selectedMeasureIndex] = nextSelectedMeasure;
+        let measure = nextState.getMeasure({
+            measureIndex: state.selectedMeasureIndex
+        });
 
-        let nextSelectedMeasureIndex, nextSelectedBeatIndex;
+        let track = nextState.getTrack({
+            measureIndex: state.selectedMeasureIndex,
+            trackIndex: selectedTrackIndex,
+            beatIndex: selectedBeatIndex
+        });
+        track.beats.splice(selectedBeatIndex, 1, action.beat);
 
-        if (selectedBeatIndex === nextSelectedMeasure.numberOfBeats - 1) {
-            nextSelectedMeasureIndex = state.selectedMeasureIndex + 1;
-            nextSelectedBeatIndex = 0;
+        // Factor out this logic from selectionRight
+        if (selectedBeatIndex === measure.numberOfBeats - 1) {
+            nextState.selectedMeasureIndex = state.selectedMeasureIndex + 1;
+            nextState.selectedBeatIndex = 0;
         } else {
-            nextSelectedMeasureIndex = state.selectedMeasureIndex;
-            nextSelectedBeatIndex = selectedBeatIndex + 1;
+            nextState.selectedMeasureIndex = state.selectedMeasureIndex;
+            nextState.selectedBeatIndex = selectedBeatIndex + 1;
         }
 
-        return Object.assign(_.clone(state), {
-            measures: nextMeasures,
-            selectedMeasureIndex: nextSelectedMeasureIndex,
-            selectedBeatIndex: nextSelectedBeatIndex
-        });
+        return nextState;
     } else if (action.type === 'INSERT_MEASURE' && state.inputMode === INPUT_MODES.NORMAL) {
-        let nextMeasures = _.clone(state.measures);
-        let nextSelectedMeasure = cloneOrCreateMeasure(nextMeasures, state.selectedMeasureIndex);
-        nextMeasures.splice(state.selectedMeasureIndex, 0, nextSelectedMeasure);
-
-        return Object.assign(_.clone(state), {
-            measures: nextMeasures
+        let nextState = clonePath({
+            state,
+            measureIndex: state.selectedMeasureIndex
         });
-    } else if (action.type === 'ADD_CHORD' && state.inputMode === INPUT_MODES.NORMAL) {
-        let nextMeasures = _.clone(state.measures);
-        let nextSelectedMeasure;
 
-        if (state.selectedMeasureIndex >= state.measures.length) {
-            nextSelectedMeasure = cloneOrCreateMeasure(nextMeasures, state.measures.length);
-        } else {
-            nextSelectedMeasure = _.cloneDeep(nextMeasures[state.selectedMeasureIndex]);
+        if (state.measures.length === nextState.measures.length) {
+            nextState.measures.splice(state.selectedMeasureIndex, 0, state.createDefaultMeasure());
         }
 
-        let chordTrack = nextSelectedMeasure.getChordTrack();
-
-        if (chordTrack) {
-            chordTrack.setChord({
-                chord: action.chord,
-                beatIndex: (state.selectedBeatIndex !== null) ? state.selectedBeatIndex : undefined,
-                division: (state.selectedDivision !== null) ? state.selectedDivision : undefined
-            });
-
-            nextMeasures[state.selectedMeasureIndex] = nextSelectedMeasure;
-        }
-
-        return Object.assign(_.clone(state), { measures: nextMeasures });
-    } else if (action.type === 'SET_PITCH' && state.inputMode === INPUT_MODES.PITCH) {
-        let nextMeasures = _.clone(state.measures);
-        let nextSelectedMeasure = nextMeasures[state.selectedMeasureIndex];
-
-        if (nextSelectedMeasure) {
-            let selectedNote = state.getNote({
-                measureIndex: state.selectedMeasureIndex,
-                trackIndex: state.selectedTrackIndex,
-                beatIndex: state.selectedBeatIndex,
-                division: state.selectedDivision
-            });
-
-            if (selectedNote) {
-                selectedNote.pitch = action.pitch;
-            }
-        }
-
-        return Object.assign(_.clone(state), { measures: nextMeasures });
+        return nextState;
+    } else if (action.type === 'SET_NOTE') {
+        return setNote(state, action);
     } else if (action.type === 'SELECTION_LEFT' && state.inputMode === INPUT_MODES.NORMAL) {
         return selectionLeft(state);
     } else if (action.type === 'SELECTION_RIGHT' && state.inputMode === INPUT_MODES.NORMAL) {
@@ -161,7 +99,8 @@ const songReducer = (state = defaultSong, action) => {
 
         return nextSong;
     } else if (action.type === 'DELETE_MEASURE' && state.inputMode === INPUT_MODES.NORMAL) {
-        let nextMeasures = nextMeasures = state.measures.filter((measure, index) => index !== action.measureIndex);
+        let filterFn = (measure, index) => index !== action.measureIndex;
+        let nextMeasures = nextMeasures = state.measures.filter(filterFn);
         let nextSelectedBeatIndex = null;
 
         return Object.assign(_.clone(state), {
@@ -169,26 +108,33 @@ const songReducer = (state = defaultSong, action) => {
             selectedBeatIndex: nextSelectedBeatIndex
         });
     } else if (action.type === 'DELETE_NOTE' && state.inputMode === INPUT_MODES.NORMAL) {
-        let selectedMeasure = state.measures[state.selectedMeasureIndex];
+        let selectedTrackIndex = state.selectedTrackIndex || 0;
+        let selectedBeatIndex = state.selectedBeatIndex || 0;
 
-        if (selectedMeasure && state.selectedBeatIndex !== null) {
-            let nextMeasures = _.clone(state.measures);
-            let nextSelectedMeasure = _.clone(nextMeasures[state.selectedMeasureIndex]);
-            let nextTracks = _.clone(nextSelectedMeasure.tracks);
-            let nextSelectedTrack = _.cloneDeep(nextTracks[state.selectedTrackIndex]);
+        let note = state.getNote({
+            measureIndex: state.selectedMeasureIndex,
+            trackIndex: selectedTrackIndex,
+            beatIndex: selectedBeatIndex,
+            division: state.selectedDivision
+        });
 
-            nextSelectedTrack.deleteNote({
-                beatIndex: state.selectedBeatIndex,
+        if (note) {
+            let nextState = clonePath({
+                state,
+                measureIndex: state.selectedMeasureIndex,
+                trackIndex: selectedTrackIndex,
+                beatIndex: selectedBeatIndex,
                 division: state.selectedDivision
             });
 
-            nextTracks[state.selectedTrackIndex] = nextSelectedTrack;
-            nextSelectedMeasure.tracks = nextTracks;
-            nextMeasures[state.selectedMeasureIndex] = nextSelectedMeasure;
-
-            return Object.assign(_.clone(state), {
-                measures: nextMeasures
+            nextState.deleteNote({
+                measureIndex: state.selectedMeasureIndex,
+                trackIndex: selectedTrackIndex,
+                beatIndex: selectedBeatIndex,
+                division: state.selectedDivision
             });
+
+            return nextState;
         } else {
             return state;
         }

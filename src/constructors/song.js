@@ -1,3 +1,5 @@
+import Measure from '../constructors/measure';
+import Note from '../constructors/note';
 import Division from '../constructors/division';
 import { INPUT_MODES } from '../constants.js';
 
@@ -37,16 +39,55 @@ export default class Song {
         this.selectionTuplet = selectionTuplet;
         this.inputMode = inputMode;
     }
-    getNote({ measureIndex, trackIndex, beatIndex, division }) {
-        let measure = this.measures[measureIndex]
+    createDefaultMeasure() {
+        let getTrackParams = (id) => {
+            return Object.assign({}, this.defaultTrackParams, this.perTrackParams[id]);
+        }
+
+        return new Measure({
+            numberOfBeats: this.defaultNumberOfBeats,
+            defaultTuplet: this.defaultTuplet,
+            trackIds: Object.keys(this.perTrackParams),
+            getTrackParams
+        });
+
+        // TODO: Change trackIds to getTrackIds
+    }
+    createDefaultNote() {
+        return new Note({ division: _.clone(this.selectedDivision) });
+    }
+    getMeasure({ measureIndex }) {
+        let measure = this.measures[measureIndex];
+
+        return measure;
+    }
+    getTrack({ measureIndex, trackIndex }) {
+        let measure = this.getMeasure({ measureIndex });
 
         if (measure) {
-            let track = measure.tracks[trackIndex];
+            return measure.tracks[trackIndex];
+        }
+    }
+    getBeat({ measureIndex, trackIndex, beatIndex }) {
+        let track = this.getTrack({ measureIndex, trackIndex });
 
-            if (track) {
-                let beatNotes = track.beats[beatIndex].notes;
-                return beatNotes.filter((note) => note.division.eq(division))[0];
-            }
+        if (track) {
+            return track.beats[beatIndex];
+        }
+    }
+    getNote({ measureIndex, trackIndex, beatIndex, division }) {
+        let beat = this.getBeat({ measureIndex, trackIndex, beatIndex });
+
+        if (beat) {
+            let beatNotes = beat.notes;
+            return beatNotes.filter((note) => note.division.eq(division))[0];
+        }
+    }
+    deleteNote({ measureIndex, trackIndex, beatIndex, division }) {
+        let beat = this.getBeat({ measureIndex, trackIndex, beatIndex });
+
+        if (beat) {
+            beat.notes = beat.notes.filter((note) => !note.division.eq(division));
         }
     }
 };

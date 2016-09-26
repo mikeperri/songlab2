@@ -17,6 +17,7 @@ import { INPUT_MODES } from '../../constants.js';
 import {
     insertMeasure,
     setBeat,
+    setNote,
     setPitch,
     addChord,
     selectionLeft,
@@ -43,6 +44,9 @@ const mapDispatchToProps = (dispatch) => {
         },
         onSetBeat: (beat, tuplet) => {
             dispatch(setBeat(beat, tuplet));
+        },
+        onSetNote: (noteParams) => {
+            dispatch(setNote(noteParams));
         },
         onSetPitch: (pitch) => {
             dispatch(setPitch(pitch));
@@ -144,7 +148,7 @@ const EditableSong = React.createClass({
 
                 let chord = getChordForDegree(this.props.song.key, degree, chordModifiers);
 
-                this.props.onAddChord(chord);
+                this.props.onSetNote({ chord });
             }
         }
     },
@@ -176,7 +180,7 @@ const EditableSong = React.createClass({
             input = (<PitchInput
                 document={this.props.document}
                 keySignature={song.key}
-                onPitch={this.props.onSetPitch}
+                onSetNote={this.props.onSetNote}
                 />);
         }
 

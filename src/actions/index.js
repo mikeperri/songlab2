@@ -15,12 +15,12 @@ export const setBeat = (beat, tuplet) => {
     };
 };
 
-export const setPitch = (pitch) => {
+export const setNote = (noteParams) => {
     return {
-        type: types.SET_PITCH,
-        pitch
-    };
-};
+        type: types.SET_NOTE,
+        noteParams
+    }
+}
 
 export const addToPitchOffset = (delta) => {
     return {
@@ -41,13 +41,6 @@ export const insertMeasure = (measureIndex) => {
         type: types.INSERT_MEASURE,
         measureIndex
     }
-};
-
-export const addChord = (chord) => {
-    return {
-        type: types.ADD_CHORD,
-        chord
-    };
 };
 
 export const selectionLeft = () => {
@@ -112,5 +105,17 @@ export const setSelectionTuplet = (tuplet) => {
     return {
         type: types.SET_SELECTION_TUPLET,
         tuplet
+    }
+}
+
+export const selectNextNote = () => {
+    return {
+        type: types.SELECT_NEXT_NOTE
+    }
+}
+
+export const selectPrevNote = () => {
+    return {
+        type: types.SELECT_PREV_NOTE
     }
 }
