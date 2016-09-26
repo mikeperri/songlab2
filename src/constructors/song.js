@@ -9,6 +9,7 @@ export default class Song {
         measures = [],
         defaultNumberOfBeats = 4,
         defaultTuplet = 1,
+        tuplets = [1, 3],
         defaultTrackOptions = {},
         perTrackParams = {
             0: { name: 'Chord Track', type: 'chord', index: 0 },
@@ -28,6 +29,7 @@ export default class Song {
         this.measures = measures;
         this.defaultNumberOfBeats = defaultNumberOfBeats;
         this.defaultTuplet = defaultTuplet;
+        this.tuplets = tuplets;
         this.defaultTrackOptions = defaultTrackOptions;
         this.perTrackParams = perTrackParams;
         this.selectedMeasureIndex = selectedMeasureIndex;

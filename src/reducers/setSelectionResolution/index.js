@@ -13,11 +13,13 @@ export default function setSelectionResolution(state, action) {
         nextDivision[0] = division[0] << difference;
     }
 
-    nextDivision[1] = 1 << nextSelectionResolution;
+    nextDivision[1] = (1 << nextSelectionResolution) * state.selectionTuplet;
 
     let nextSelectionTuplet = state.selectionTuplet;
     if (state.selectionResolution === 0 && nextSelectionResolution === 0) {
         nextSelectionTuplet = 1;
+        nextDivision[0] = 0;
+        nextDivision[1] = 1;
     }
 
     return Object.assign(_.clone(state), {

@@ -6,7 +6,7 @@ import Track from '../constructors/track.js';
 import Note from '../constructors/note.js';
 import Division from '../constructors/division';
 import { UNDOABLE_ACTION_TYPES } from '../utils/undoable.js';
-import { INPUT_MODES } from '../constants.js';
+import { INPUT_MODES, MAX_RESOLUTION } from '../constants.js';
 import clonePath from '../utils/clonePath';
 
 import setNote from './setNote.js';
@@ -140,10 +140,60 @@ const songReducer = (state = defaultSong, action) => {
             selectedDivision: new Division(0, 1)
         });
     } else if (action.type === 'SELECT_NEXT_NOTE') {
-        let measure = state.getSelectedMeasure();
-        console.log(measure);
+        if (!state.getSelectedBeat()) {
+            return state;
+        }
 
-        return state;
+        function getNextSelectionResolutionAndTuplet({ selectedDivision, selectionResolution, tuplets }) {
+            let tupletIndex = 0;
+            let tuplet;
+
+            while (tupletIndex < tuplets.length) {
+                tuplet = tuplets[tupletIndex];
+
+                while (selectionResolution <= MAX_RESOLUTION) {
+                    if (tuplet * Math.pow(2, selectionResolution) % selectedDivision[1] === 0) {
+                        return {
+                            nextSelectionResolution: selectionResolution,
+                            nextSelectionTuplet: tuplet
+                        };
+                    }
+                    selectionResolution++;
+                }
+
+                tupletIndex++;
+                selectionResolution = 0;
+            }
+
+            throw new Error('Not supposed to happen.');
+        }
+
+        let nextState = _.clone(state);
+        let notes = state.getSelectedBeat().getNotesAfterDivision(state.selectedDivision);
+
+        while (notes && notes.length === 0) {
+            if (nextState.selectedBeatIndex < nextState.getSelectedMeasure().numberOfBeats - 1) {
+                nextState.selectedBeatIndex++;
+            } else {
+                nextState.selectedMeasureIndex++;
+                nextState.selectedBeatIndex = 0;
+            }
+            nextState.selectedDivision = new Division(0, 1);
+            notes = nextState.getSelectedMeasure() && nextState.getSelectedBeat().notes;
+        }
+
+        if (notes && notes.length > 0) {
+            nextState.selectedDivision = notes[0].division;
+            let { nextSelectionResolution, nextSelectionTuplet } = getNextSelectionResolutionAndTuplet({
+                selectedDivision: nextState.selectedDivision,
+                selectionResolution: state.selectionResolution,
+                tuplets: state.tuplets
+            });
+            nextState.selectionResolution = nextSelectionResolution;
+            nextState.selectionTuplet = nextSelectionTuplet;
+        }
+
+        return nextState;
     } else if (action.type === 'SELECT_PREV_NOTE') {
         return state;
     } else {
