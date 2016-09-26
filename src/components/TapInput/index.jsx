@@ -74,10 +74,9 @@ export default React.createClass({
                 prevTap,
                 tap
             );
-            let beat = new Beat({ notes, nextBeatNotes });
-
+            let beat = new Beat({ notes });
             beat.addNotes(this.nextBeatNotes);
-            this.nextBeatNotes = beat.nextBeatNotes;
+            this.nextBeatNotes = nextBeatNotes;
 
             this.props.onSetBeat(beat);
             this.pendingNoteTimes = [];
@@ -106,9 +105,9 @@ export default React.createClass({
         let rawDivision = msIntoBeat / divisionPeriod;
         let divisionNumerator = Math.abs(Math.round(rawDivision));
         let error = (divisionNumerator - rawDivision) * divisionPeriod;
-        let nextBeat = divisionNumerator == divisionCount;
+        let nextBeat = msIntoBeat >= 0 && divisionNumerator >= divisionCount;
 
-        if (nextBeat) {
+        if (msIntoBeat < 0 || nextBeat) {
             divisionNumerator = 0;
         }
 
@@ -137,36 +136,40 @@ export default React.createClass({
         return Number(bestTupletStr);
     },
     quantizeBeat: function (beatDivisions, tuplets, noteTimes, tap1, tap2) {
+        let notes, nextBeatNotes, tuplet;
+
         if (noteTimes.length === 0) {
-            return new Beat({});
-        }
+            notes = [];
+            nextBeatNotes = [];
+            tuplet = 1;
+        } else {
+            let period = this.getPeriod([tap1.time, tap2.time]);
+            let activeTuplets = _(tuplets)
+               .pickBy((t) => t === true)
+               .keys()
+               .value();
+            let tupletToNotes = {};
+            let tupletToError = {};
 
-        let period = this.getPeriod([tap1.time, tap2.time]);
-        let activeTuplets = _(tuplets)
-           .pickBy((t) => t === true)
-           .keys()
-           .value();
-        let tupletToNotes = {};
-        let tupletToError = {};
+            _.forEach(activeTuplets, (tupletStr) => {
+                let tuplet = Number(tupletStr);
+                let notes = _.map(noteTimes, (noteTime) => {
+                    let msIntoBeat = noteTime - tap1.time;
 
-        _.forEach(activeTuplets, (tupletStr) => {
-            let tuplet = Number(tupletStr);
-            let notes = _.map(noteTimes, (noteTime) => {
-                let msIntoBeat = noteTime - tap1.time;
+                    return this.buildNote(beatDivisions, period, tuplet, msIntoBeat);
+                });
 
-                return this.buildNote(beatDivisions, period, tuplet, msIntoBeat);
+                tupletToNotes[tupletStr] = notes;
+                tupletToError[tupletStr] = this.calculateNormalizedError(notes);
             });
 
-            tupletToNotes[tupletStr] = notes;
-            tupletToError[tupletStr] = this.calculateNormalizedError(notes);
-        });
+            tuplet = this.chooseBestTuplet(tupletToError);
+            let allNotes = tupletToNotes[tuplet];
+            notes = _.reject(allNotes, { 'nextBeat': true });
+            nextBeatNotes = _.filter(allNotes, { 'nextBeat': true });
+        }
 
-        let bestTuplet = this.chooseBestTuplet(tupletToError);
-        let allNotes = tupletToNotes[bestTuplet];
-        let notes = _.reject(allNotes, { 'nextBeat': true });
-        let nextBeatNotes = _.filter(allNotes, { 'nextBeat': true });
-
-        return { notes, nextBeatNotes, tuplet: bestTuplet };
+        return { notes, nextBeatNotes, tuplet };
     },
     getPeriod: function (taps) {
         let sum = 0;

@@ -7,7 +7,7 @@ import TapInput from '.';
 import Division from '../../constructors/division';
 
 describe('<TapInput />', () => {
-    let keydownCb;
+    let keydownCb, onSetBeat;
     const mockDocument = {
         addEventListener: function (eventName, cb) {
             if (eventName === 'keydown') {
@@ -15,11 +15,12 @@ describe('<TapInput />', () => {
             }
         },
         removeEventListener: sinon.spy()
-    }
+    };
     describe('the quantizeBeat function', () => {
         let wrapper;
         beforeEach(() => {
-            wrapper = mount(<TapInput document={mockDocument}/>);
+            onSetBeat = sinon.spy();
+            wrapper = mount(<TapInput document={mockDocument} onSetBeat={onSetBeat}/>);
         });
         it('should quantize five quarter notes, where the last one should go to the next beat', () => {
             let beatDivisions = 4;
@@ -137,10 +138,10 @@ describe('<TapInput />', () => {
         });
     });
     describe('once started', () => {
-        let wrapper, clock, setBeatsCb;
+        let wrapper, clock;
         beforeEach(() => {
-            setBeatsCb = sinon.spy()
-            wrapper = mount(<TapInput document={mockDocument} onSetBeats={setBeatsCb}/>);
+            onSetBeat = sinon.spy();
+            wrapper = mount(<TapInput document={mockDocument} onSetBeat={onSetBeat}/>);
             clock = sinon.useFakeTimers();
         });
 
@@ -162,9 +163,7 @@ describe('<TapInput />', () => {
             clock.tick(50);
             keydownCb({ key: ' ', preventDefault });
 
-            expect(setBeatsCb.getCalls().length).to.equal(2);
-            expect(setBeatsCb.firstCall.args[0].length).to.equal(1);
-            expect(setBeatsCb.secondCall.args[0].length).to.equal(1);
+            expect(onSetBeat.getCalls().length).to.equal(2);
         });
 
         it('should create an empty beat when no notes are registered during the beat', () => {
@@ -177,9 +176,7 @@ describe('<TapInput />', () => {
             clock.tick(100);
             keydownCb({ key: ' ', preventDefault });
 
-            expect(setBeatsCb.getCalls().length).to.equal(2);
-            expect(setBeatsCb.firstCall.args[0].length).to.equal(1);
-            expect(setBeatsCb.secondCall.args[0].length).to.equal(1);
+            expect(onSetBeat.getCalls().length).to.equal(2);
         });
 
         it('should handle an early note', () => {
@@ -187,16 +184,17 @@ describe('<TapInput />', () => {
 
             clock.tick(111);
             keydownCb({ key: 'a', preventDefault });
-            clock.tick(10);
+            clock.tick(1000);
             keydownCb({ key: ' ', preventDefault });
             clock.tick(90);
             keydownCb({ key: ' ', preventDefault });
             clock.tick(100);
             keydownCb({ key: ' ', preventDefault });
 
-            expect(setBeatsCb.getCalls().length).to.equal(2);
+            expect(onSetBeat.getCalls().length).to.equal(2);
 
-            let firstBeat = setBeatsCb.firstCall.args[0][0];
+            let firstBeat = onSetBeat.firstCall.args[0];
+            console.log('first beat', firstBeat);
             expect(firstBeat.notes[0].division[0]).to.equal(0);
         });
     });

@@ -1,3 +1,5 @@
+import _ from 'lodash';
+
 const ACTION_TYPES = {
     UNDO: 'UNDO',
     REDO: 'REDO'
@@ -14,7 +16,7 @@ export default function undoable(reducer, config) {
 
     function getNextState(prevState, state) {
         if (config.properties) {
-            return Object.assign({}, prevState, _.pick(state, config.properties));
+            return Object.assign(_.clone(prevState), _.pick(state, config.properties));
         } else {
             return state;
         }

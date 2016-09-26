@@ -15,8 +15,14 @@ export default function setSelectionResolution(state, action) {
 
     nextDivision[1] = 1 << nextSelectionResolution;
 
+    let nextSelectionTuplet = state.selectionTuplet;
+    if (state.selectionResolution === 0 && nextSelectionResolution === 0) {
+        nextSelectionTuplet = 1;
+    }
+
     return Object.assign(_.clone(state), {
         selectionResolution: nextSelectionResolution,
-        selectedDivision: nextDivision
+        selectedDivision: nextDivision,
+        selectionTuplet: nextSelectionTuplet
     });
 };

@@ -61,12 +61,23 @@ export default class Song {
 
         return measure;
     }
+    getSelectedMeasure() {
+        return this.getMeasure({
+            measureIndex: this.selectedMeasureIndex
+        });
+    }
     getTrack({ measureIndex, trackIndex }) {
         let measure = this.getMeasure({ measureIndex });
 
         if (measure) {
             return measure.tracks[trackIndex];
         }
+    }
+    getSelectedTrack() {
+        return this.getTrack({
+            measureIndex: this.selectedMeasureIndex,
+            trackIndex: this.selectedTrackIndex
+        });
     }
     getBeat({ measureIndex, trackIndex, beatIndex }) {
         let track = this.getTrack({ measureIndex, trackIndex });
@@ -75,6 +86,13 @@ export default class Song {
             return track.beats[beatIndex];
         }
     }
+    getSelectedBeat() {
+        return this.getBeat({
+            measureIndex: this.selectedMeasureIndex,
+            trackIndex: this.selectedTrackIndex,
+            beatIndex: this.selectedBeatIndex
+        });
+    }
     getNote({ measureIndex, trackIndex, beatIndex, division }) {
         let beat = this.getBeat({ measureIndex, trackIndex, beatIndex });
 
@@ -82,6 +100,14 @@ export default class Song {
             let beatNotes = beat.notes;
             return beatNotes.filter((note) => note.division.eq(division))[0];
         }
+    }
+    getSelectedNote() {
+        return this.getNote({
+            measureIndex: this.selectedMeasureIndex,
+            trackIndex: this.selectedTrackIndex,
+            beatIndex: this.selectedBeatIndex,
+            division: this.selectedDivision
+        });
     }
     deleteNote({ measureIndex, trackIndex, beatIndex, division }) {
         let beat = this.getBeat({ measureIndex, trackIndex, beatIndex });

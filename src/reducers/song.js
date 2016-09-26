@@ -108,29 +108,21 @@ const songReducer = (state = defaultSong, action) => {
             selectedBeatIndex: nextSelectedBeatIndex
         });
     } else if (action.type === 'DELETE_NOTE' && state.inputMode === INPUT_MODES.NORMAL) {
-        let selectedTrackIndex = state.selectedTrackIndex || 0;
-        let selectedBeatIndex = state.selectedBeatIndex || 0;
+        if (state.selectedTrackIndex !== null) {
+            let note = state.getSelectedNote();
 
-        let note = state.getNote({
-            measureIndex: state.selectedMeasureIndex,
-            trackIndex: selectedTrackIndex,
-            beatIndex: selectedBeatIndex,
-            division: state.selectedDivision
-        });
-
-        if (note) {
             let nextState = clonePath({
                 state,
                 measureIndex: state.selectedMeasureIndex,
-                trackIndex: selectedTrackIndex,
-                beatIndex: selectedBeatIndex,
+                trackIndex: state.selectedTrackIndex,
+                beatIndex: state.selectedBeatIndex,
                 division: state.selectedDivision
             });
 
             nextState.deleteNote({
                 measureIndex: state.selectedMeasureIndex,
-                trackIndex: selectedTrackIndex,
-                beatIndex: selectedBeatIndex,
+                trackIndex: state.selectedTrackIndex,
+                beatIndex: state.selectedBeatIndex,
                 division: state.selectedDivision
             });
 
@@ -141,10 +133,19 @@ const songReducer = (state = defaultSong, action) => {
     } else if (action.type === 'SET_SELECTION_RESOLUTION') {
         return setSelectionResolution(state, action);
     } else if (action.type === 'SET_SELECTION_TUPLET') {
-        return Object.assign(_.clone(state), {
+        let nextState = setSelectionResolution(state, { resolution: 0 });
+
+        return Object.assign(nextState, {
             selectionTuplet: action.tuplet,
             selectedDivision: new Division(0, 1)
         });
+    } else if (action.type === 'SELECT_NEXT_NOTE') {
+        let measure = state.getSelectedMeasure();
+        console.log(measure);
+
+        return state;
+    } else if (action.type === 'SELECT_PREV_NOTE') {
+        return state;
     } else {
         return state;
     }

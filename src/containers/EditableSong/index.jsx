@@ -26,6 +26,8 @@ import {
     selectionDown,
     setSelectionResolution,
     setSelectionTuplet,
+    selectNextNote,
+    selectPrevNote,
     deleteMeasure,
     deleteNote,
     setInputMode
@@ -71,6 +73,12 @@ const mapDispatchToProps = (dispatch) => {
         },
         onSetSelectionTuplet: (tuplet) => {
             dispatch(setSelectionTuplet(tuplet));
+        },
+        onSelectNextNote: () => {
+            dispatch(selectNextNote());
+        },
+        onSelectPrevNote: () => {
+            dispatch(selectPrevNote());
         },
         onDeleteMeasure: (measureIndex) => {
             dispatch(deleteMeasure(measureIndex));
@@ -132,6 +140,10 @@ const EditableSong = React.createClass({
             let tuplet = this.props.song.selectionTuplet;
             let nextTuplet = tuplet === 3 ? 1 : 3;
             this.props.onSetSelectionTuplet(nextTuplet);
+        } else if (e.key === 'w') {
+            this.props.onSelectNextNote();
+        } else if (e.key === 'b') {
+            this.props.onSelectPrevNote();
         } else {
             let degree = keyboardEventToDegree(e);
 
