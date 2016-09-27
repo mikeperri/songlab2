@@ -18,6 +18,10 @@ export default class Beat {
     addNotes(notes) {
         notes.forEach(this.addNote.bind(this));
     }
+    getNotesBeforeDivision(division) {
+        let filterFn = (n) => n.division.lt(division);
+        return this.notes.filter(filterFn);
+    }
     getNotesAfterDivision(division) {
         let filterFn = (n) => n.division.gt(division);
         return this.notes.filter(filterFn);

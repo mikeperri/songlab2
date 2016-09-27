@@ -107,9 +107,9 @@ const EditableSong = React.createClass({
             return;
         }
 
-        if (e.key.toLowerCase() === 's') {
+        if (e.key.toLowerCase() === '.') {
             upKeyActive = true;
-        } else if (e.key.toLowerCase() === 'b') {
+        } else if (e.key.toLowerCase() === ',') {
             downKeyActive = true;
         } else if (e.key === 'h' || e.key === 'ArrowLeft') {
             this.props.onSelectionLeft();

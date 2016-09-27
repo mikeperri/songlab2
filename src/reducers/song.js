@@ -18,6 +18,30 @@ const defaultSong = new Song({});
 
 const songReducer = (state = defaultSong, action) => {
 
+    function getNextSelectionResolutionAndTuplet({ selectedDivision, selectionResolution, tuplets }) {
+        let tupletIndex = 0;
+        let tuplet;
+
+        while (tupletIndex < tuplets.length) {
+            tuplet = tuplets[tupletIndex];
+
+            while (selectionResolution <= MAX_RESOLUTION) {
+                if (tuplet * Math.pow(2, selectionResolution) % selectedDivision[1] === 0) {
+                    return {
+                        nextSelectionResolution: selectionResolution,
+                        nextSelectionTuplet: tuplet
+                    };
+                }
+                selectionResolution++;
+            }
+
+            tupletIndex++;
+            selectionResolution = 0;
+        }
+
+        throw new Error('Not supposed to happen.');
+    }
+
     if (action.type === 'SET_INPUT_MODE') {
         return Object.assign(_.clone(state), { inputMode: action.inputMode });
     } else if (action.type === 'SET_BEAT') {
@@ -153,30 +177,6 @@ const songReducer = (state = defaultSong, action) => {
             return state;
         }
 
-        function getNextSelectionResolutionAndTuplet({ selectedDivision, selectionResolution, tuplets }) {
-            let tupletIndex = 0;
-            let tuplet;
-
-            while (tupletIndex < tuplets.length) {
-                tuplet = tuplets[tupletIndex];
-
-                while (selectionResolution <= MAX_RESOLUTION) {
-                    if (tuplet * Math.pow(2, selectionResolution) % selectedDivision[1] === 0) {
-                        return {
-                            nextSelectionResolution: selectionResolution,
-                            nextSelectionTuplet: tuplet
-                        };
-                    }
-                    selectionResolution++;
-                }
-
-                tupletIndex++;
-                selectionResolution = 0;
-            }
-
-            throw new Error('Not supposed to happen.');
-        }
-
         let nextState = _.clone(state);
         let notes = state.getSelectedBeat().getNotesAfterDivision(state.selectedDivision);
 
@@ -207,7 +207,48 @@ const songReducer = (state = defaultSong, action) => {
 
         return nextState;
     } else if (action.type === 'SELECT_PREV_NOTE') {
-        return state;
+        if (state.selectedTrackIndex === null) {
+            return state;
+        }
+
+        let nextState;
+
+        if (!state.getSelectedMeasure()) {
+            nextState = selectionLeft(state);
+        } else {
+            nextState = _.clone(state);
+        }
+
+        let notes = nextState.getSelectedBeat().getNotesBeforeDivision(nextState.selectedDivision);
+
+        while (notes.length === 0) {
+            if (nextState.selectedBeatIndex > 0) {
+                nextState.selectedBeatIndex--;
+            } else if (nextState.selectedMeasureIndex > 0) {
+                nextState.selectedMeasureIndex--;
+                nextState.selectedBeatIndex = nextState.getSelectedMeasure().numberOfBeats - 1;
+            } else {
+                break;
+            }
+            nextState.selectedDivision = new Division(0, 1);
+            notes = nextState.getSelectedBeat().notes;
+        }
+
+        if (notes.length > 0) {
+            nextState.selectedDivision = _.last(notes).division;
+            let filterFn = (t) => t !== state.selectionTuplet;
+            let tuplets = [ state.selectionTuplet ].concat(state.tuplets.filter(filterFn));
+
+            let { nextSelectionResolution, nextSelectionTuplet } = getNextSelectionResolutionAndTuplet({
+                selectedDivision: nextState.selectedDivision,
+                selectionResolution: state.selectionResolution,
+                tuplets
+            });
+            nextState.selectionResolution = nextSelectionResolution;
+            nextState.selectionTuplet = nextSelectionTuplet;
+        }
+
+        return nextState;
     } else {
         return state;
     }
