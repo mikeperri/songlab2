@@ -80,7 +80,7 @@ const songReducer = (state = defaultSong, action) => {
         if (state.selectedTrackIndex === 0) {
             nextSong.selectedTrackIndex = null;
             nextSong.selectedBeatIndex = null;
-            nextSong.selectedDivisionIndex = null;
+            nextSong.selectedDivision = new Division(0, 1);
         } else if (state.selectedTrackIndex !== null) {
             nextSong.selectedTrackIndex = state.selectedTrackIndex - 1;
         }
@@ -92,10 +92,19 @@ const songReducer = (state = defaultSong, action) => {
         if (state.selectedTrackIndex === null) {
             nextSong.selectedTrackIndex = 0;
             nextSong.selectedBeatIndex = 0;
-            nextSong.selectedDivisionIndex = 0;
         } else if (state.selectedTrackIndex < Object.keys(state.perTrackParams).length - 1) {
             nextSong.selectedTrackIndex = state.selectedTrackIndex + 1;
         }
+
+        return nextSong;
+    } else if (action.type === 'SELECTION_TO_START' && state.inputMode === INPUT_MODES.NORMAL) {
+        let nextSong = _.clone(state);
+
+        if (nextSong.getSelectedBeat()) {
+            nextSong.selectedBeatIndex = 0;
+            nextSong.selectedDivision = new Division(0, 1);
+        }
+        nextSong.selectedMeasureIndex = 0;
 
         return nextSong;
     } else if (action.type === 'DELETE_MEASURE' && state.inputMode === INPUT_MODES.NORMAL) {

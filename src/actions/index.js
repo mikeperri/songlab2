@@ -67,6 +67,12 @@ export const selectionDown = () => {
     };
 };
 
+export const selectionToStart = () => {
+    return {
+        type: types.SELECTION_TO_START
+    };
+};
+
 export const deleteMeasure = (measureIndex) => {
     return {
         type: types.DELETE_MEASURE,

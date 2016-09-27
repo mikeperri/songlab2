@@ -24,6 +24,7 @@ import {
     selectionRight,
     selectionUp,
     selectionDown,
+    selectionToStart,
     setSelectionResolution,
     setSelectionTuplet,
     selectNextNote,
@@ -67,6 +68,9 @@ const mapDispatchToProps = (dispatch) => {
         },
         onSelectionDown: () => {
             dispatch(selectionDown());
+        },
+        onSelectionToStart: () => {
+            dispatch(selectionToStart());
         },
         onSetSelectionResolution: (resolution) => {
             dispatch(setSelectionResolution(resolution));
@@ -115,6 +119,8 @@ const EditableSong = React.createClass({
             this.props.onSelectionDown();
         } else if (e.key === 'k' || e.key === 'ArrowUp') {
             this.props.onSelectionUp();
+        } else if (e.key === '0') {
+            this.props.onSelectionToStart();
         } else if (e.key === 'i') {
             let measureIndex = this.props.song.selectedMeasureIndex;
 
