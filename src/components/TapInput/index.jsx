@@ -43,6 +43,7 @@ export default React.createClass({
     },
     handleKeyDown: function (e) {
         if (e.key === ' ') {
+            e.preventDefault();
             this.handleTap();
         } else {
             this.handleNote();

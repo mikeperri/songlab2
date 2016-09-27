@@ -22,6 +22,13 @@ export const setNote = (noteParams) => {
     }
 }
 
+export const inputPitch = (pitch) => {
+    return {
+        type: types.INPUT_PITCH,
+        pitch
+    };
+}
+
 export const addToPitchOffset = (delta) => {
     return {
         type: types.ADD_TO_PITCH_OFFSET,

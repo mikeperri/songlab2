@@ -18,7 +18,7 @@ import {
     insertMeasure,
     setBeat,
     setNote,
-    setPitch,
+    inputPitch,
     addChord,
     selectionLeft,
     selectionRight,
@@ -51,8 +51,8 @@ const mapDispatchToProps = (dispatch) => {
         onSetNote: (noteParams) => {
             dispatch(setNote(noteParams));
         },
-        onSetPitch: (pitch) => {
-            dispatch(setPitch(pitch));
+        onInputPitch: (pitch) => {
+            dispatch(inputPitch(pitch));
         },
         onAddChord: (chord) => {
             dispatch(addChord(chord));
@@ -198,7 +198,7 @@ const EditableSong = React.createClass({
             input = (<PitchInput
                 document={this.props.document}
                 keySignature={song.key}
-                onSetNote={this.props.onSetNote}
+                onInputPitch={this.props.onInputPitch}
                 />);
         }
 
