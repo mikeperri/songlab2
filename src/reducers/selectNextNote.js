@@ -23,13 +23,12 @@ export default function selectNextNote(state) {
 
     if (notes && notes.length > 0) {
         nextState.selectedDivision = notes[0].division;
-        let filterFn = (t) => t !== state.selectionTuplet;
-        let tuplets = [ state.selectionTuplet ].concat(state.tuplets.filter(filterFn));
 
         let { nextSelectionResolution, nextSelectionTuplet } = getNextSelectionResolutionAndTuplet({
             selectedDivision: nextState.selectedDivision,
             selectionResolution: state.selectionResolution,
-            tuplets
+            selectionTuplet: state.selectionTuplet,
+            tuplets: state.tuplets
         });
         nextState.selectionResolution = nextSelectionResolution;
         nextState.selectionTuplet = nextSelectionTuplet;

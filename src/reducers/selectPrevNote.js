@@ -8,12 +8,12 @@ export default function selectPrevNote(state) {
         return state;
     }
 
-    let nextState;
+    let nextState = _.clone(state);
 
     if (!state.getSelectedMeasure()) {
-        nextState = selectionLeft(state);
-    } else {
-        nextState = _.clone(state);
+        nextState.selectedMeasureIndex = state.selectedMeasureIndex - 1;
+        nextState.selectedBeatIndex = nextState.getSelectedMeasure().numberOfBeats - 1;
+        nextState.selectedDivision = new Division(1, 1);
     }
 
     let notes = nextState.getSelectedBeat().getNotesBeforeDivision(nextState.selectedDivision);
@@ -33,13 +33,12 @@ export default function selectPrevNote(state) {
 
     if (notes.length > 0) {
         nextState.selectedDivision = _.last(notes).division;
-        let filterFn = (t) => t !== state.selectionTuplet;
-        let tuplets = [ state.selectionTuplet ].concat(state.tuplets.filter(filterFn));
 
         let { nextSelectionResolution, nextSelectionTuplet } = getNextSelectionResolutionAndTuplet({
             selectedDivision: nextState.selectedDivision,
             selectionResolution: state.selectionResolution,
-            tuplets
+            selectionTuplet: state.selectionTuplet,
+            tuplets: state.tuplets
         });
         nextState.selectionResolution = nextSelectionResolution;
         nextState.selectionTuplet = nextSelectionTuplet;

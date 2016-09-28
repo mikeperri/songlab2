@@ -1,26 +1,40 @@
+import _ from 'lodash';
 import { MAX_RESOLUTION } from '../constants.js';
 
-export default function getNextSelectionResolutionAndTuplet({ selectedDivision, selectionResolution, tuplets }) {
-    let tupletIndex = 0;
-    let tuplet;
+function check(resolution, tuplet, selectedDivision) {
+    let denominator = tuplet * Math.pow(2, resolution);
+    let numerators = _.range(0, denominator);
 
-    while (tupletIndex < tuplets.length) {
-        tuplet = tuplets[tupletIndex];
+    return !_.isUndefined(_.find(numerators, (numerator) => {
+        return selectedDivision.eq([numerator, denominator]);
+    }));
+}
 
-        while (selectionResolution <= MAX_RESOLUTION) {
-            if (tuplet * Math.pow(2, selectionResolution) % selectedDivision[1] === 0) {
-                return {
-                    nextSelectionResolution: selectionResolution,
-                    nextSelectionTuplet: tuplet
-                };
-            }
-            selectionResolution++;
-        }
+export default function getNextSelectionResolutionAndTuplet({ selectedDivision, selectionResolution, selectionTuplet, tuplets }) {
+    let resolutions = _.range(0, MAX_RESOLUTION);
+    let nextSelectionResolution;
+    let nextSelectionTuplet;
 
-        tupletIndex++;
-        selectionResolution = 0;
+    if (check(selectionResolution, selectionTuplet, selectedDivision)) {
+        nextSelectionResolution = selectionResolution;
+        nextSelectionTuplet = selectionTuplet;
+    } else {
+        nextSelectionTuplet = _.find(tuplets, (tuplet) => {
+            nextSelectionResolution = _.find(resolutions, (resolution) => {
+                return check(resolution, tuplet, selectedDivision);
+            });
+            return !_.isUndefined(nextSelectionResolution);
+        });
     }
 
-    throw new Error('Not supposed to happen.');
+    if (_.isUndefined(nextSelectionTuplet)) {
+        throw new Error('Could not find an appropriate selection resolution & tuplet for selected division');
+    } else {
+        return {
+            nextSelectionResolution,
+            nextSelectionTuplet
+        };
+    }
+
 }
 
